@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivr GH — Interactive Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --brand:#1A56A0;--brand-dark:#0F3D7A;--brand-light:#E8F0FA;--brand-mid:#2563EB;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --teal:#0F766E;--teal-light:#CCFBF1;
+  --purple:#7C3AED;--purple-light:#EDE9FE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --gray50:#F9FAFB;--gray100:#F3F4F6;--gray200:#E5E7EB;--gray300:#D1D5DB;
+  --gray400:#9CA3AF;--gray500:#6B7280;--gray600:#4B5563;--gray700:#374151;--gray800:#1F2937;
+  --text:#1F2937;--text-soft:#6B7280;--bg:#F4F6FB;--surface:#FFFFFF;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  --font:'Inter',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--gray200);display:flex;flex-direction:column;flex-shrink:0;z-index:10}
+.sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--gray100)}
+.sidebar-logo{font-size:22px;font-weight:700;color:var(--brand);letter-spacing:-0.5px}
+.sidebar-logo span{color:var(--amber)}
+.sidebar-tagline{font-size:11px;color:var(--gray400);margin-top:2px;letter-spacing:0.3px}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:10px;font-weight:600;color:var(--gray400);letter-spacing:0.8px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13.5px;font-weight:500;color:var(--gray600);cursor:pointer;border-radius:0;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{background:var(--gray50);color:var(--gray800)}
+.nav-item.active{background:var(--brand-light);color:var(--brand);border-left-color:var(--brand)}
+.nav-item i{font-size:16px;width:18px}
+.sidebar-footer{padding:16px;border-top:1px solid var(--gray100)}
+.persona-switcher{background:var(--gray50);border-radius:var(--radius-sm);padding:10px 12px}
+.persona-label{font-size:10px;font-weight:600;color:var(--gray400);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px}
+.persona-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.persona-btn{padding:5px 4px;font-size:11px;font-weight:500;border:1px solid var(--gray200);border-radius:6px;cursor:pointer;background:var(--surface);color:var(--gray600);text-align:center;transition:all 0.15s}
+.persona-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:1px solid var(--gray200);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-title{font-size:16px;font-weight:600;color:var(--gray800)}
+.topbar-sub{font-size:12px;color:var(--gray400);margin-top:1px}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.badge.green{background:var(--green-light);color:#166534}
+.badge.amber{background:var(--amber-light);color:#92400E}
+.badge.red{background:var(--red-light);color:#991B1B}
+.badge.blue{background:var(--brand-light);color:var(--brand-dark)}
+.badge.gray{background:var(--gray100);color:var(--gray600)}
+.badge i{font-size:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* SCREENS */
+.screen{display:none}
+.screen.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--gray200);overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--gray100);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:600;color:var(--gray800)}
+.card-body{padding:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+
+/* STAT CARDS */
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:18px 20px;border:1px solid var(--gray200)}
+.stat-label{font-size:12px;color:var(--gray400);font-weight:500;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;color:var(--gray800);line-height:1}
+.stat-change{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.stat-change.up{color:var(--green)}
+.stat-change.down{color:var(--red)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:var(--font)}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:var(--brand-dark)}
+.btn-secondary{background:var(--gray100);color:var(--gray700)}
+.btn-secondary:hover{background:var(--gray200)}
+.btn-outline{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.btn-outline:hover{background:var(--brand-light)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-lg{padding:12px 24px;font-size:15px;border-radius:10px}
+.btn-full{width:100%;justify-content:center}
+.btn i{font-size:15px}
+
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:500;color:var(--gray700);margin-bottom:6px}
+.form-input{width:100%;padding:10px 12px;border:1px solid var(--gray300);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font);color:var(--gray800);background:var(--surface);outline:none;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,86,160,0.08)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-hint{font-size:11px;color:var(--gray400);margin-top:4px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.data-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--gray400);letter-spacing:0.5px;text-transform:uppercase;border-bottom:1px solid var(--gray200);background:var(--gray50)}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--gray100);color:var(--gray700)}
+.data-table tr:hover td{background:var(--gray50)}
+.data-table tr:last-child td{border-bottom:none}
+
+/* MAP */
+.map-container{position:relative;border-radius:var(--radius);overflow:hidden;background:#E8EFF7;height:320px}
+.map-canvas{width:100%;height:100%;position:relative}
+.map-road{position:absolute;background:#fff;border-radius:2px}
+.map-label{position:absolute;font-size:10px;color:var(--gray500);font-weight:500;white-space:nowrap}
+.map-pin{position:absolute;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;transition:all 0.5s ease}
+.map-pin i{transform:rotate(45deg);font-size:13px}
+.map-pin.pickup{background:var(--brand);color:#fff}
+.map-pin.dropoff{background:var(--red);color:#fff}
+.map-pin.driver{background:var(--amber);color:#fff}
+.map-route{position:absolute;border-top:3px dashed var(--brand);opacity:0.6}
+.map-overlay{position:absolute;bottom:12px;left:12px;background:var(--surface);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.12)}
+.map-eta{font-weight:700;font-size:18px;color:var(--brand)}
+
+/* MOBILE FRAME */
+.mobile-frame{width:360px;background:var(--surface);border-radius:28px;border:8px solid var(--gray800);overflow:hidden;flex-shrink:0;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.mobile-frame .screen-inner{height:680px;overflow-y:auto;overflow-x:hidden}
+.mobile-status-bar{height:28px;background:var(--brand);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:11px;color:#fff;font-weight:500}
+
+/* BOOKING FLOW */
+.vehicle-card{padding:14px;border:2px solid var(--gray200);border-radius:var(--radius);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:12px}
+.vehicle-card:hover{border-color:var(--brand);background:var(--brand-light)}
+.vehicle-card.selected{border-color:var(--brand);background:var(--brand-light)}
+.vehicle-icon{width:44px;height:44px;background:var(--gray100);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:22px}
+.vehicle-name{font-weight:600;font-size:14px}
+.vehicle-desc{font-size:12px;color:var(--gray400)}
+.vehicle-price{margin-left:auto;font-weight:700;color:var(--brand);font-size:15px}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:var(--gray200)}
+.timeline-item{position:relative;margin-bottom:20px}
+.timeline-item::before{content:'';position:absolute;left:-23px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--gray200);border:2px solid var(--surface);z-index:1}
+.timeline-item.done::before{background:var(--green)}
+.timeline-item.active::before{background:var(--brand);box-shadow:0 0 0 3px var(--brand-light)}
+.timeline-time{font-size:11px;color:var(--gray400);font-weight:500}
+.timeline-text{font-size:13.5px;color:var(--gray700);margin-top:2px}
+
+/* DRIVER STATUS */
+.online-toggle{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gray50);border-radius:var(--radius-sm);cursor:pointer}
+.toggle-switch{width:44px;height:24px;background:var(--gray300);border-radius:12px;position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle-switch.on{background:var(--green)}
+.toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform 0.2s}
+.toggle-switch.on::after{transform:translateX(20px)}
+
+/* NOTIFICATION POPUP */
+.notif-popup{position:fixed;top:80px;right:20px;width:320px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--gray200);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.12);z-index:100;transform:translateX(360px);transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+.notif-popup.show{transform:translateX(0)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--gray200);margin-bottom:20px}
+.tab{padding:10px 18px;font-size:13.5px;font-weight:500;color:var(--gray500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+
+/* STEPS */
+.steps{display:flex;align-items:center;margin-bottom:24px;gap:0}
+.step{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--gray400)}
+.step.done .step-num{background:var(--green);color:#fff;border-color:var(--green)}
+.step.active .step-num{background:var(--brand);color:#fff;border-color:var(--brand)}
+.step.active{color:var(--brand)}
+.step-num{width:24px;height:24px;border-radius:50%;border:2px solid var(--gray300);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.step-line{flex:1;height:2px;background:var(--gray200);margin:0 6px}
+.step-line.done{background:var(--green)}
+
+/* ORDER OFFER */
+.order-offer{background:var(--surface);border:2px solid var(--brand);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px}
+.offer-timer{width:48px;height:48px;border-radius:50%;border:3px solid var(--brand);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--brand);flex-shrink:0}
+
+/* RATING */
+.stars{display:flex;gap:4px}
+.star{font-size:24px;cursor:pointer;color:var(--gray300);transition:color 0.1s}
+.star.active{color:var(--amber)}
+
+/* PAYMENT OPTION */
+.pay-option{padding:14px;border:2px solid var(--gray200);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.pay-option:hover{border-color:var(--brand)}
+.pay-option.selected{border-color:var(--brand);background:var(--brand-light)}
+.pay-icon{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px}
+
+/* WELCOME / LANDING */
+.landing{min-height:100vh;background:linear-gradient(160deg,#0F3D7A 0%,#1A56A0 50%,#2563EB 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:40px 24px;text-align:center}
+.landing-logo{font-size:48px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:8px}
+.landing-logo span{color:#FCD34D}
+.landing-sub{font-size:18px;color:rgba(255,255,255,0.75);margin-bottom:48px;font-weight:300}
+.landing-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;width:100%;max-width:780px;margin-bottom:40px}
+.landing-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius-lg);padding:28px 24px;cursor:pointer;transition:all 0.2s;text-align:left}
+.landing-card:hover{background:rgba(255,255,255,0.18);transform:translateY(-2px)}
+.landing-card-icon{font-size:32px;margin-bottom:14px}
+.landing-card-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:6px}
+.landing-card-desc{font-size:13px;color:rgba(255,255,255,0.65);line-height:1.5}
+.landing-badge{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);font-size:12px;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.demo-note{font-size:12px;color:rgba(255,255,255,0.5);margin-top:16px}
+
+/* SMS DEMO */
+.sms-bubble{max-width:85%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5;margin-bottom:8px}
+.sms-in{background:var(--gray100);color:var(--gray700);align-self:flex-start;border-bottom-left-radius:4px}
+.sms-out{background:var(--brand);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;margin-left:auto}
+.sms-thread{display:flex;flex-direction:column;gap:4px;padding:16px}
+
+/* MISC */
+.divider{height:1px;background:var(--gray100);margin:20px 0}
+.empty-state{text-align:center;padding:40px 20px;color:var(--gray400)}
+.empty-state i{font-size:40px;margin-bottom:12px;display:block}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:500;background:var(--gray100);color:var(--gray600)}
+.chip.brand{background:var(--brand-light);color:var(--brand)}
+.chip.green{background:var(--green-light);color:#166534}
+.chip.amber{background:var(--amber-light);color:#92400E}
+.chip.red{background:var(--red-light);color:#991B1B}
+.progress-bar{height:6px;background:var(--gray200);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:var(--brand);transition:width 0.5s}
+
+/* CORPORATE DASHBOARD SPECIFIC */
+.spend-ring{width:120px;height:120px;border-radius:50%;border:8px solid var(--gray100);display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;flex-shrink:0}
+.fleet-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray100)}
+.driver-avatar{width:36px;height:36px;border-radius:50%;background:var(--brand-light);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .grid4{grid-template-columns:1fr 1fr}
+  .sidebar{display:none}
+  .mobile-frame{width:100%}
+}
+
+/* ANIMATE */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@keyframes driverMove{0%{left:20%;top:60%}25%{left:35%;top:50%}50%{left:50%;top:40%}75%{left:65%;top:35%}100%{left:72%;top:30%}}
+.fade-in{animation:fadeIn 0.3s ease}
+.pulsing{animation:pulse 2s infinite}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+</head>
+<body>
+
+<!-- LANDING SCREEN -->
+<div id="landing-screen" class="landing">
+  <div class="landing-badge">🇬🇭 Live Prototype — Accra, Ghana</div>
+  <div class="landing-logo">Delivr<span>GH</span></div>
+  <div class="landing-sub">Fast. Fair. For Everyone. — Interactive Product Demo</div>
+  <div class="landing-cards">
+    <div class="landing-card" onclick="enterApp('customer')">
+      <div class="landing-card-icon">🛍️</div>
+      <div class="landing-card-title">Customer</div>
+      <div class="landing-card-desc">Book deliveries, track your package live, and pay seamlessly with mobile money or card.</div>
+      <div style="margin-top:14px"><span style="background:rgba(255,255,255,0.2);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px">Individual & Corporate</span></div>
+    </div>
+    <div class="landing-card" onclick="enterApp('driver')">
+      <div class="landing-card-icon">🏍️</div>
+      <div class="landing-card-title">Driver (App)</div>
+      <div class="landing-card-desc">Receive orders, navigate deliveries, and get paid instantly to your mobile money wallet.</div>
+      <div style="margin-top:14px"><span style="background:rgba(255,255,255,0.2);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px">Motorbike · Car · Van</span></div>
+    </div>
+    <div class="landing-card" onclick="enterApp('sms')">
+      <div class="landing-card-icon">📱</div>
+      <div class="landing-card-title">SMS Driver</div>
+      <div class="landing-card-desc">No smartphone needed. Receive orders and manage deliveries entirely through SMS and USSD.</div>
+      <div style="margin-top:14px"><span style="background:#FCD34D;color:#92400E;font-size:11px;padding:4px 10px;border-radius:20px">⭐ Key differentiator</span></div>
+    </div>
+    <div class="landing-card" onclick="enterApp('corporate')">
+      <div class="landing-card-icon">🏢</div>
+      <div class="landing-card-title">Corporate Portal</div>
+      <div class="landing-card-desc">Manage your fleet, track all company deliveries, and access monthly invoices and analytics.</div>
+      <div style="margin-top:14px"><span style="background:rgba(255,255,255,0.2);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px">Web Dashboard</span></div>
+    </div>
+  </div>
+  <div class="demo-note">All data is simulated for demo purposes. No real transactions are processed.</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" class="app" style="display:none">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">Delivr<span>GH</span></div>
+      <div class="sidebar-tagline" id="persona-label">Customer Portal</div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="persona-switcher">
+        <div class="persona-label">Switch view</div>
+        <div class="persona-btns">
+          <div class="persona-btn active" id="pb-customer" onclick="switchPersona('customer')">Customer</div>
+          <div class="persona-btn" id="pb-driver" onclick="switchPersona('driver')">Driver</div>
+          <div class="persona-btn" id="pb-corp" onclick="switchPersona('corporate')">Corp</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub" id="topbar-sub">Welcome back, Ama</div>
+      </div>
+      <div class="topbar-actions">
+        <div id="topbar-badge"></div>
+        <div onclick="showNotif()" style="cursor:pointer;position:relative">
+          <i class="ti ti-bell" style="font-size:20px;color:var(--gray500)"></i>
+          <span id="notif-dot" style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--red);border-radius:50%;display:none"></span>
+        </div>
+        <div class="avatar" id="user-avatar">AK</div>
+      </div>
+    </div>
+
+    <div class="content" id="main-content">
+      <!-- screens loaded here -->
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION POPUP -->
+<div class="notif-popup" id="notif-popup">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <span style="font-size:14px;font-weight:600">Notifications</span>
+    <i class="ti ti-x" style="cursor:pointer;color:var(--gray400)" onclick="hideNotif()"></i>
+  </div>
+  <div id="notif-list"></div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+var state = {
+  persona: 'customer',
+  screen: 'home',
+  bookingStep: 0,
+  selectedVehicle: 'motorbike',
+  selectedPayment: 'momo',
+  driverOnline: false,
+  bookingStatus: 'idle',
+  offerTimer: 60,
+  offerInterval: null,
+  trackInterval: null,
+  driverPos: { x: 20, y: 60 },
+  ratingValue: 0,
+  activeTab: 0,
+  notifications: [
+    { icon: 'ti-package', text: 'Your delivery DLV-00042 has been picked up', time: '2 min ago', unread: true },
+    { icon: 'ti-star', text: 'Kwame rated your delivery 5 stars', time: '1 hr ago', unread: true },
+    { icon: 'ti-wallet', text: 'GHS 28.50 added to your wallet', time: '3 hr ago', unread: false },
+  ]
+};
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+var navConfigs = {
+  customer: {
+    label: 'Customer Portal', user: 'Ama Kuffour', initials: 'AK',
+    badge: { text: 'Individual', cls: 'blue' },
+    nav: [
+      { icon: 'ti-layout-dashboard', label: 'Dashboard', screen: 'home' },
+      { icon: 'ti-plus', label: 'New booking', screen: 'book' },
+      { icon: 'ti-package', label: 'My deliveries', screen: 'deliveries' },
+      { icon: 'ti-map-pin', label: 'Track package', screen: 'track' },
+      { icon: 'ti-user', label: 'My profile', screen: 'profile' },
+    ]
+  },
+  driver: {
+    label: 'Driver Portal', user: 'Kwame Mensah', initials: 'KM',
+    badge: { text: '🏍 Online', cls: 'green' },
+    nav: [
+      { icon: 'ti-layout-dashboard', label: 'Dashboard', screen: 'driver-home' },
+      { icon: 'ti-package', label: 'Active trip', screen: 'active-trip' },
+      { icon: 'ti-history', label: 'Trip history', screen: 'trip-history' },
+      { icon: 'ti-wallet', label: 'Earnings', screen: 'earnings' },
+      { icon: 'ti-user', label: 'My profile', screen: 'driver-profile' },
+    ]
+  },
+  sms: {
+    label: 'SMS Driver Demo', user: 'Kofi Acheampong', initials: 'KA',
+    badge: { text: 'SMS Driver', cls: 'amber' },
+    nav: [
+      { icon: 'ti-message', label: 'SMS demo', screen: 'sms-demo' },
+      { icon: 'ti-hash', label: 'USSD menu', screen: 'ussd-demo' },
+      { icon: 'ti-history', label: 'Order history', screen: 'sms-history' },
+    ]
+  },
+  corporate: {
+    label: 'Corporate Portal', user: 'Abena Osei-Mensah', initials: 'AO',
+    badge: { text: 'Accra Foods Ltd', cls: 'blue' },
+    nav: [
+      { icon: 'ti-layout-dashboard', label: 'Overview', screen: 'corp-home' },
+      { icon: 'ti-plus', label: 'Book delivery', screen: 'book' },
+      { icon: 'ti-truck', label: 'All deliveries', screen: 'corp-deliveries' },
+      { icon: 'ti-users', label: 'Fleet drivers', screen: 'fleet' },
+      { icon: 'ti-chart-bar', label: 'Analytics', screen: 'analytics' },
+      { icon: 'ti-file-invoice', label: 'Invoices', screen: 'invoices' },
+      { icon: 'ti-settings', label: 'Settings', screen: 'corp-settings' },
+    ]
+  }
+};
+
+function enterApp(persona) {
+  document.getElementById('landing-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  switchPersona(persona);
+}
+
+function switchPersona(persona) {
+  state.persona = persona;
+  // if sms, override to sms-demo screen
+  var cfg = navConfigs[persona];
+  state.screen = cfg.nav[0].screen;
+
+  // update persona buttons
+  ['customer','driver','corp'].forEach(function(p) {
+    var btn = document.getElementById('pb-'+p);
+    if(btn) btn.classList.toggle('active', p === persona || (persona === 'sms' && p === 'driver') || (persona === 'corporate' && p === 'corp'));
+  });
+  if(persona === 'sms') {
+    document.getElementById('pb-driver').classList.add('active');
+    document.getElementById('pb-customer').classList.remove('active');
+    document.getElementById('pb-corp').classList.remove('active');
+  }
+  if(persona === 'corporate') {
+    document.getElementById('pb-corp').classList.add('active');
+    document.getElementById('pb-customer').classList.remove('active');
+    document.getElementById('pb-driver').classList.remove('active');
+  }
+
+  document.getElementById('persona-label').textContent = cfg.label;
+  document.getElementById('user-avatar').textContent = cfg.initials;
+  document.getElementById('topbar-sub').textContent = 'Welcome, ' + cfg.user;
+
+  var badgeEl = document.getElementById('topbar-badge');
+  badgeEl.innerHTML = '<span class="badge '+cfg.badge.cls+'">'+cfg.badge.text+'</span>';
+
+  // notification dot
+  var unread = state.notifications.filter(function(n){return n.unread;}).length;
+  var dot = document.getElementById('notif-dot');
+  dot.style.display = unread > 0 ? 'block' : 'none';
+
+  buildNav(persona);
+  navigateTo(state.screen);
+}
+
+function buildNav(persona) {
+  var cfg = navConfigs[persona];
+  var nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = '';
+  cfg.nav.forEach(function(item) {
+    var el = document.createElement('div');
+    el.className = 'nav-item' + (item.screen === state.screen ? ' active' : '');
+    el.setAttribute('data-screen', item.screen);
+    el.innerHTML = '<i class="ti '+item.icon+'"></i><span>'+item.label+'</span>';
+    el.onclick = function() { navigateTo(item.screen); };
+    nav.appendChild(el);
+  });
+}
+
+function navigateTo(screen) {
+  state.screen = screen;
+  document.querySelectorAll('.nav-item').forEach(function(el) {
+    el.classList.toggle('active', el.getAttribute('data-screen') === screen);
+  });
+  var cfg = navConfigs[state.persona];
+  var navItem = cfg.nav.find(function(n){ return n.screen === screen; });
+  document.getElementById('topbar-title').textContent = navItem ? navItem.label : screen;
+
+  var content = document.getElementById('main-content');
+  content.innerHTML = '';
+  var screen_fn = screens[screen];
+  if(screen_fn) {
+    content.innerHTML = screen_fn();
+    if(screen === 'track') startTracking();
+    if(screen === 'driver-home') setupDriverToggle();
+    if(screen === 'sms-demo') setupSMSDemo();
+    if(screen === 'active-trip' && state.bookingStatus === 'accepted') startTripTimer();
+  } else {
+    content.innerHTML = '<div class="empty-state"><i class="ti ti-tools"></i><p>Screen coming soon</p></div>';
+  }
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────────────
+var screens = {};
+
+// CUSTOMER HOME
+screens['home'] = function() {
+  return '<div class="fade-in">' +
+  '<div class="grid4" style="margin-bottom:20px">' +
+    statCard('Total bookings','24','<span class="stat-change up"><i class="ti ti-trending-up"></i> +3 this week</span>') +
+    statCard('Active','1','<span class="stat-change"><span class="chip green pulsing">● Live</span></span>') +
+    statCard('Completed','22','<span class="stat-change up"><i class="ti ti-check"></i> All delivered</span>') +
+    statCard('Total spent','GHS 342','<span class="stat-change"><span style="color:var(--gray400);font-size:11px">This month</span></span>') +
+  '</div>' +
+  '<div class="grid2">' +
+    '<div class="card">' +
+      '<div class="card-header"><span class="card-title">Recent deliveries</span><button class="btn btn-secondary btn-sm" onclick="navigateTo(\'deliveries\')">See all</button></div>' +
+      '<div style="padding:0 4px">' +
+        bookingRow('DLV-00047','Madina → Osu','Today 2:15pm','GHS 28.50','delivered') +
+        bookingRow('DLV-00046','East Legon → Tema','Yesterday','GHS 45.00','delivered') +
+        bookingRow('DLV-00045','Accra Mall → Kasoa','Dec 28','GHS 62.00','delivered') +
+      '</div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-header"><span class="card-title">Active booking</span><span class="badge green"><i class="ti ti-circle-filled" style="font-size:8px"></i> Live</span></div>' +
+      '<div class="card-body">' +
+        '<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--gray400);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">DLV-00048</div>' +
+        '<div style="font-size:14px;font-weight:600">Ring Road Central → Accra Central</div>' +
+        '<div style="font-size:12px;color:var(--gray500);margin-top:2px">Motorbike · GHS 22.00</div></div>' +
+        '<div class="timeline">' +
+          '<div class="timeline-item done"><div class="timeline-time">2:05pm</div><div class="timeline-text">Booking confirmed</div></div>' +
+          '<div class="timeline-item done"><div class="timeline-time">2:08pm</div><div class="timeline-text">Driver Kwame assigned</div></div>' +
+          '<div class="timeline-item active"><div class="timeline-time">2:14pm</div><div class="timeline-text">Package picked up — en route</div></div>' +
+          '<div class="timeline-item"><div class="timeline-time">ETA 2:28pm</div><div class="timeline-text">Delivery at destination</div></div>' +
+        '</div>' +
+        '<button class="btn btn-outline btn-sm btn-full" style="margin-top:16px" onclick="navigateTo(\'track\')"><i class="ti ti-map-pin"></i> Track live</button>' +
+      '</div>' +
+    '</div>' +
+  '</div></div>';
+};
+
+function statCard(label, value, extra) {
+  return '<div class="stat-card"><div class="stat-label">'+label+'</div><div class="stat-value">'+value+'</div>'+(extra||'')+'</div>';
+}
+function bookingRow(ref, route, date, fare, status) {
+  var statusHtml = status === 'delivered' ? '<span class="chip green">Delivered</span>' : status === 'active' ? '<span class="chip brand">Live</span>' : '<span class="chip">'+status+'</span>';
+  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--gray100)">' +
+    '<div><div style="font-size:13.5px;font-weight:500">'+route+'</div><div style="font-size:12px;color:var(--gray400)">'+ref+' · '+date+'</div></div>' +
+    '<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div style="font-size:13px;font-weight:600">'+fare+'</div>'+statusHtml+'</div>' +
+  '</div>';
+}
+
+// BOOK
+screens['book'] = function() {
+  return buildBookingFlow();
+};
+
+function buildBookingFlow() {
+  var steps = [
+    { label: 'Route' },
+    { label: 'Vehicle' },
+    { label: 'Payment' },
+    { label: 'Confirm' }
+  ];
+  var s = state.bookingStep;
+  var stepsHtml = '<div class="steps">';
+  steps.forEach(function(step, i) {
+    var cls = i < s ? 'done' : (i === s ? 'active' : '');
+    stepsHtml += '<div class="step '+cls+'"><div class="step-num">'+(i < s ? '<i class="ti ti-check" style="font-size:10px"></i>' : (i+1))+'</div><span>'+step.label+'</span></div>';
+    if(i < steps.length-1) stepsHtml += '<div class="step-line'+(i < s ? ' done' : '')+'"></div>';
+  });
+  stepsHtml += '</div>';
+  var body = '';
+  if(s === 0) body = bookStep0();
+  else if(s === 1) body = bookStep1();
+  else if(s === 2) body = bookStep2();
+  else if(s === 3) body = bookStep3();
+  else body = bookStepDone();
+
+  return '<div class="fade-in" style="max-width:620px">' +
+    '<div class="card">' +
+      '<div class="card-header"><span class="card-title">New booking</span></div>' +
+      '<div class="card-body">' + stepsHtml + body + '</div>' +
+    '</div></div>';
+}
+
+function bookStep0() {
+  return '<div class="form-group"><label class="form-label"><i class="ti ti-map-pin" style="color:var(--brand)"></i> Pickup location</label>' +
+    '<input class="form-input" id="pickup-input" value="Ring Road Central, Accra" placeholder="Enter pickup address"></div>' +
+    '<div class="form-group"><label class="form-label"><i class="ti ti-flag" style="color:var(--red)"></i> Delivery address</label>' +
+    '<input class="form-input" id="dropoff-input" value="" placeholder="Enter destination address"></div>' +
+    '<div style="background:var(--gray50);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--gray500)">' +
+      '<i class="ti ti-plus-circle" style="color:var(--brand)"></i> <a href="#" style="color:var(--brand);text-decoration:none" onclick="addStop();return false">Add another stop (multi-stop delivery)</a>' +
+    '</div>' +
+    '<div id="extra-stops"></div>' +
+    '<div class="form-group"><label class="form-label">Package description</label><input class="form-input" value="Documents" placeholder="What are you sending?"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label">Package size</label>' +
+        '<select class="form-input form-select"><option>Small (documents, envelope)</option><option>Medium (shoe box)</option><option>Large (shopping bag)</option></select>' +
+      '</div>' +
+      '<div class="form-group"><label class="form-label">Fragile?</label>' +
+        '<select class="form-input form-select"><option>No</option><option>Yes (+GHS 1.50)</option></select>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:10px;justify-content:flex-end"><button class="btn btn-primary" onclick="nextBookingStep()"><i class="ti ti-arrow-right"></i> Continue</button></div>';
+}
+
+function addStop() {
+  var cont = document.getElementById('extra-stops');
+  var div = document.createElement('div');
+  div.className = 'form-group';
+  div.innerHTML = '<label class="form-label"><i class="ti ti-map-pin" style="color:var(--amber)"></i> Additional stop</label>' +
+    '<input class="form-input" placeholder="Enter stop address">';
+  cont.appendChild(div);
+}
+
+function bookStep1() {
+  var vehicles = [
+    { id:'motorbike', icon:'🏍️', name:'Motorbike', desc:'Small packages, documents', price:'GHS 18.00–28.00', eta:'15–20 min', avail:7 },
+    { id:'car', icon:'🚗', name:'Car / Sedan', desc:'Medium packages up to 20kg', price:'GHS 28.00–45.00', eta:'18–25 min', avail:4 },
+    { id:'van', icon:'🚐', name:'Van', desc:'Large or bulk deliveries', price:'GHS 48.00–85.00', eta:'20–35 min', avail:2 },
+  ];
+  var html = vehicles.map(function(v) {
+    var sel = state.selectedVehicle === v.id;
+    return '<div class="vehicle-card'+(sel?' selected':'')+'" onclick="selectVehicle(\''+v.id+'\')">' +
+      '<div class="vehicle-icon">'+v.icon+'</div>' +
+      '<div style="flex:1"><div class="vehicle-name">'+v.name+'</div><div class="vehicle-desc">'+v.desc+'</div>' +
+      '<div style="font-size:12px;color:var(--gray400);margin-top:3px"><i class="ti ti-clock" style="font-size:11px"></i> '+v.eta+' · '+v.avail+' available</div></div>' +
+      '<div style="text-align:right"><div class="vehicle-price">'+v.price+'</div></div>' +
+    '</div>';
+  }).join('');
+  return html +
+    '<div style="background:var(--brand-light);border-radius:var(--radius-sm);padding:12px 14px;margin:16px 0;font-size:13px;color:var(--brand)">' +
+      '<i class="ti ti-clock" style="font-size:14px"></i> Estimated fare for Ring Road → Osu (3.2 km): <strong id="fare-display">GHS 18.00</strong>' +
+    '</div>' +
+    '<div style="display:flex;gap:10px;justify-content:space-between">' +
+      '<button class="btn btn-secondary" onclick="prevBookingStep()">Back</button>' +
+      '<button class="btn btn-primary" onclick="nextBookingStep()"><i class="ti ti-arrow-right"></i> Continue</button>' +
+    '</div>';
+}
+
+function selectVehicle(v) {
+  state.selectedVehicle = v;
+  var fares = { motorbike:'GHS 18.00', car:'GHS 28.50', van:'GHS 48.00' };
+  document.querySelectorAll('.vehicle-card').forEach(function(el) {
+    el.classList.toggle('selected', el.onclick.toString().includes("'"+v+"'"));
+  });
+  var fd = document.getElementById('fare-display');
+  if(fd) fd.textContent = fares[v];
+}
+
+function bookStep2() {
+  var methods = [
+    { id:'momo', icon:'📱', name:'MTN Mobile Money', desc:'Instant · most popular', badge:'MTN' },
+    { id:'vodafone', icon:'📲', name:'Vodafone Cash', desc:'Instant approval', badge:'VF' },
+    { id:'card', icon:'💳', name:'Visa / Mastercard', desc:'Saved card ending 4242', badge:'' },
+    { id:'cash', icon:'💵', name:'Cash on delivery', desc:'Orders ≤ GHS 25 only', badge:'', disabled: true },
+  ];
+  var fares = { motorbike:18, car:28.5, van:48 };
+  var fare = fares[state.selectedVehicle];
+  var html = methods.map(function(m) {
+    var sel = state.selectedPayment === m.id;
+    var dis = m.disabled ? ' style="opacity:0.45;pointer-events:none"' : '';
+    return '<div class="pay-option'+(sel?' selected':'')+'" onclick="selectPayment(\''+m.id+'\');"'+dis+'>' +
+      '<div class="pay-icon">'+m.icon+'</div>' +
+      '<div><div style="font-size:14px;font-weight:500">'+m.name+'</div><div style="font-size:12px;color:var(--gray400)">'+m.desc+'</div></div>' +
+      (m.disabled ? '<div style="margin-left:auto;font-size:11px;color:var(--red)">Fare too high</div>' : '') +
+    '</div>';
+  }).join('');
+  return html +
+    '<div class="divider"></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px"><span>Fare</span><span>GHS '+fare.toFixed(2)+'</span></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px"><span>Platform fee</span><span style="color:var(--green)">GHS 0.00 ✓</span></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;margin-bottom:16px"><span>Total</span><span>GHS '+fare.toFixed(2)+'</span></div>' +
+    '<p style="font-size:11px;color:var(--gray400);margin-bottom:16px"><i class="ti ti-shield-check" style="color:var(--green)"></i> 100% goes to your driver. Zero hidden fees.</p>' +
+    '<div style="display:flex;gap:10px;justify-content:space-between">' +
+      '<button class="btn btn-secondary" onclick="prevBookingStep()">Back</button>' +
+      '<button class="btn btn-primary" onclick="nextBookingStep()"><i class="ti ti-arrow-right"></i> Review order</button>' +
+    '</div>';
+}
+
+function selectPayment(m) {
+  state.selectedPayment = m;
+  document.querySelectorAll('.pay-option').forEach(function(el) {
+    el.classList.toggle('selected', el.onclick.toString().includes("'"+m+"'"));
+  });
+}
+
+function bookStep3() {
+  var vNames = { motorbike:'Motorbike', car:'Car / Sedan', van:'Van' };
+  var pNames = { momo:'MTN Mobile Money', vodafone:'Vodafone Cash', card:'Visa card ··4242', cash:'Cash' };
+  var fares = { motorbike:18, car:28.5, van:48 };
+  var fare = fares[state.selectedVehicle];
+  return '<div style="background:var(--gray50);border-radius:var(--radius);padding:16px;margin-bottom:16px">' +
+    '<div style="font-weight:600;margin-bottom:12px;font-size:14px">Order summary</div>' +
+    '<div style="font-size:13.5px;display:grid;gap:8px">' +
+      '<div style="display:flex;justify-content:space-between"><span style="color:var(--gray500)">Pickup</span><span>Ring Road Central, Accra</span></div>' +
+      '<div style="display:flex;justify-content:space-between"><span style="color:var(--gray500)">Delivery</span><span>Osu Oxford Street</span></div>' +
+      '<div style="display:flex;justify-content:space-between"><span style="color:var(--gray500)">Vehicle</span><span>'+vNames[state.selectedVehicle]+'</span></div>' +
+      '<div style="display:flex;justify-content:space-between"><span style="color:var(--gray500)">Package</span><span>Documents · Small</span></div>' +
+      '<div style="display:flex;justify-content:space-between"><span style="color:var(--gray500)">Payment</span><span>'+pNames[state.selectedPayment]+'</span></div>' +
+    '</div>' +
+    '<div class="divider"></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700"><span>Total</span><span>GHS '+fare.toFixed(2)+'</span></div>' +
+  '</div>' +
+  '<div style="background:var(--green-light);border-radius:var(--radius-sm);padding:12px;font-size:13px;color:#166534;margin-bottom:16px">' +
+    '<i class="ti ti-shield-check"></i> GHS '+fare.toFixed(2)+' goes directly to your driver. No platform fees ever.' +
+  '</div>' +
+  '<div style="display:flex;gap:10px;justify-content:space-between">' +
+    '<button class="btn btn-secondary" onclick="prevBookingStep()">Back</button>' +
+    '<button class="btn btn-primary btn-lg" style="flex:1" onclick="confirmBooking()"><i class="ti ti-package"></i> Confirm & Pay GHS '+fare.toFixed(2)+'</button>' +
+  '</div>';
+}
+
+function nextBookingStep() {
+  if(state.bookingStep < 4) {
+    state.bookingStep++;
+    document.getElementById('main-content').innerHTML = buildBookingFlow();
+  }
+}
+function prevBookingStep() {
+  if(state.bookingStep > 0) {
+    state.bookingStep--;
+    document.getElementById('main-content').innerHTML = buildBookingFlow();
+  }
+}
+function confirmBooking() {
+  state.bookingStep = 5;
+  state.bookingStatus = 'searching';
+  document.getElementById('main-content').innerHTML = bookingConfirmed();
+  setTimeout(function() {
+    state.bookingStatus = 'accepted';
+    var driverEl = document.getElementById('booking-status-area');
+    if(driverEl) {
+      driverEl.innerHTML = driverAssignedCard();
+      triggerNotif('🏍️ Driver found!', 'Kwame is on his way to your pickup. ETA 12 min.');
+    }
+  }, 3000);
+}
+
+function bookingConfirmed() {
+  return '<div class="fade-in" style="max-width:500px;margin:0 auto;text-align:center">' +
+    '<div class="card"><div class="card-body" style="padding:32px">' +
+      '<div style="width:64px;height:64px;background:var(--brand-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px">📦</div>' +
+      '<div style="font-size:20px;font-weight:700;margin-bottom:8px">Booking confirmed!</div>' +
+      '<div style="font-size:14px;color:var(--gray500);margin-bottom:4px">Reference: <strong>DLV-00049</strong></div>' +
+      '<div style="font-size:13px;color:var(--gray400);margin-bottom:24px">Ring Road Central → Osu Oxford Street</div>' +
+      '<div id="booking-status-area">' +
+        '<div class="pulsing" style="font-size:14px;color:var(--brand);margin-bottom:16px"><i class="ti ti-loader-2"></i> Searching for a driver near you...</div>' +
+        '<div class="progress-bar" style="margin-bottom:24px"><div class="progress-fill" style="width:60%;animation:none"></div></div>' +
+      '</div>' +
+      '<button class="btn btn-secondary btn-full" onclick="navigateTo(\'deliveries\')">View my deliveries</button>' +
+    '</div></div></div>';
+}
+function driverAssignedCard() {
+  return '<div class="order-offer" style="text-align:left;border-color:var(--green)">' +
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">' +
+      '<div style="width:48px;height:48px;background:var(--amber-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">🏍️</div>' +
+      '<div><div style="font-weight:600;font-size:15px">Kwame Asante</div>' +
+        '<div class="stars" style="gap:2px">' +
+          '<i class="ti ti-star" style="font-size:12px;color:var(--amber)"></i>'.repeat(5) +
+          '<span style="font-size:12px;color:var(--gray500);margin-left:4px">4.9 · 312 trips</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--gray500)">Red Honda CB125 · GT-2345-21</div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px">' +
+      '<button class="btn btn-primary btn-sm" style="flex:1" onclick="navigateTo(\'track\')"><i class="ti ti-map-pin"></i> Track live</button>' +
+      '<button class="btn btn-secondary btn-sm"><i class="ti ti-phone"></i> Call</button>' +
+      '<button class="btn btn-secondary btn-sm"><i class="ti ti-message"></i> Chat</button>' +
+    '</div>' +
+  '</div>';
+}
+
+// DELIVERIES
+screens['deliveries'] = function() {
+  var deliveries = [
+    { ref:'DLV-00049', route:'Ring Road → Osu', status:'active', fare:'GHS 18.00', time:'Today, 2:32pm', driver:'Kwame A.', vehicle:'🏍️' },
+    { ref:'DLV-00048', route:'Madina Mkt → Osu', status:'delivered', fare:'GHS 28.50', time:'Today, 11:15am', driver:'Yaa M.', vehicle:'🚗' },
+    { ref:'DLV-00047', route:'East Legon → Tema', status:'delivered', fare:'GHS 45.00', time:'Yesterday', driver:'Kojo A.', vehicle:'🚗' },
+    { ref:'DLV-00046', route:'Accra Mall → Kasoa', status:'delivered', fare:'GHS 62.00', time:'Dec 28', driver:'Esi O.', vehicle:'🚐' },
+    { ref:'DLV-00045', route:'Osu → Airport Res.', status:'delivered', fare:'GHS 22.00', time:'Dec 27', driver:'Kwame A.', vehicle:'🏍️' },
+  ];
+  var rows = deliveries.map(function(d) {
+    var sc = d.status === 'active' ? 'brand' : 'green';
+    var st = d.status === 'active' ? 'Live' : 'Delivered';
+    return '<tr>' +
+      '<td><span style="font-weight:500">'+d.vehicle+' '+d.route+'</span><br><span style="font-size:11px;color:var(--gray400)">'+d.ref+'</span></td>' +
+      '<td>'+d.time+'</td>' +
+      '<td>'+d.driver+'</td>' +
+      '<td><strong>'+d.fare+'</strong></td>' +
+      '<td><span class="chip '+sc+'">'+st+'</span></td>' +
+      '<td>'+(d.status==='active'?'<button class="btn btn-outline btn-sm" onclick="navigateTo(\'track\')"><i class="ti ti-map-pin"></i> Track</button>':'<button class="btn btn-secondary btn-sm">Receipt</button>')+'</td>' +
+    '</tr>';
+  }).join('');
+  return '<div class="fade-in"><div class="card"><div class="card-header">' +
+    '<span class="card-title">My deliveries</span>' +
+    '<div style="display:flex;gap:8px"><select class="form-input form-select" style="width:auto;padding:6px 28px 6px 10px;font-size:13px"><option>All time</option><option>This week</option><option>This month</option></select>' +
+    '<button class="btn btn-secondary btn-sm"><i class="ti ti-download"></i> Export</button></div>' +
+    '</div>' +
+    '<div style="overflow-x:auto"><table class="data-table">' +
+      '<thead><tr><th>Route</th><th>Date</th><th>Driver</th><th>Fare</th><th>Status</th><th></th></tr></thead>' +
+      '<tbody>'+rows+'</tbody>' +
+    '</table></div></div></div>';
+};
+
+// TRACK
+screens['track'] = function() {
+  return '<div class="fade-in"><div class="grid2"><div>' +
+    '<div class="card" style="margin-bottom:16px">' +
+      '<div class="card-header">' +
+        '<div>' +
+          '<div class="card-title">DLV-00049 — Live tracking</div>' +
+          '<div style="font-size:12px;color:var(--gray400);margin-top:2px">Ring Road Central → Osu Oxford Street</div>' +
+        '</div>' +
+        '<span class="badge green"><i class="ti ti-circle-filled" style="font-size:8px"></i> En route</span>' +
+      '</div>' +
+      '<div style="padding:14px 20px">' +
+        '<div class="map-container" id="live-map">' +
+          buildMap() +
+        '</div>' +
+        '<div style="padding:14px 0 4px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center">' +
+          '<div><div style="font-size:11px;color:var(--gray400);font-weight:500">ETA</div><div id="eta-val" style="font-size:22px;font-weight:700;color:var(--brand)">12 min</div></div>' +
+          '<div><div style="font-size:11px;color:var(--gray400);font-weight:500">Distance left</div><div style="font-size:22px;font-weight:700;color:var(--gray700)" id="dist-val">1.8 km</div></div>' +
+          '<div><div style="font-size:11px;color:var(--gray400);font-weight:500">Driver speed</div><div style="font-size:22px;font-weight:700;color:var(--gray700)">28 km/h</div></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-header"><span class="card-title">Status updates</span></div>' +
+      '<div class="card-body">' +
+        '<div class="timeline">' +
+          '<div class="timeline-item done"><div class="timeline-time">2:05pm</div><div class="timeline-text">Booking confirmed — DLV-00049</div></div>' +
+          '<div class="timeline-item done"><div class="timeline-time">2:08pm</div><div class="timeline-text">Kwame assigned · 🏍️ GT-2345-21</div></div>' +
+          '<div class="timeline-item done"><div class="timeline-time">2:14pm</div><div class="timeline-text">Package picked up at Ring Road</div></div>' +
+          '<div class="timeline-item active"><div class="timeline-time" id="now-time">2:18pm</div><div class="timeline-text pulsing">En route to Osu Oxford Street</div></div>' +
+          '<div class="timeline-item"><div class="timeline-time">~2:30pm</div><div class="timeline-text">Delivery at destination</div></div>' +
+        '</div>' +
+        '<div class="divider"></div>' +
+        '<div style="font-size:12px;color:var(--gray400);margin-bottom:10px">Share tracking link</div>' +
+        '<div style="display:flex;gap:8px;align-items:center">' +
+          '<input class="form-input" style="font-size:12px;color:var(--brand)" value="delivrgh.com/t/ABC123XY" readonly>' +
+          '<button class="btn btn-secondary btn-sm"><i class="ti ti-copy"></i></button>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--gray400);margin-top:6px">Recipient can track without the app</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div style="margin-top:16px" class="card">' +
+    '<div class="card-header"><span class="card-title">Your driver</span></div>' +
+    '<div class="card-body" style="display:flex;align-items:center;gap:16px">' +
+      '<div style="width:52px;height:52px;border-radius:50%;background:var(--amber-light);display:flex;align-items:center;justify-content:center;font-size:22px">🏍️</div>' +
+      '<div style="flex:1"><div style="font-weight:600;font-size:15px">Kwame Asante</div>' +
+        '<div class="stars" style="gap:2px;margin:3px 0">' +
+          '<i class="ti ti-star" style="font-size:13px;color:var(--amber)"></i>'.repeat(5) +
+          '<span style="font-size:12px;color:var(--gray500)"> 4.9 (312 trips)</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--gray500)"><span class="chip">Red Honda CB125</span> <span class="chip">GT-2345-21</span></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px">' +
+        '<button class="btn btn-secondary btn-sm"><i class="ti ti-phone"></i> Call</button>' +
+        '<button class="btn btn-secondary btn-sm"><i class="ti ti-message"></i> Chat</button>' +
+      '</div>' +
+    '</div>' +
+  '</div></div>';
+};
+
+function buildMap() {
+  return '<div class="map-canvas" style="position:relative;width:100%;height:320px;overflow:hidden">' +
+    '<div style="position:absolute;inset:0;background:#d4e8d0"></div>' +
+    '<div class="map-road" style="width:100%;height:12px;top:50%;left:0;transform:translateY(-50%)"></div>' +
+    '<div class="map-road" style="height:100%;width:12px;left:40%;top:0"></div>' +
+    '<div class="map-road" style="height:100%;width:8px;left:65%;top:0"></div>' +
+    '<div class="map-road" style="width:100%;height:8px;top:30%;left:0"></div>' +
+    '<div class="map-road" style="width:100%;height:8px;top:70%;left:0"></div>' +
+    '<div class="map-label" style="top:32%;left:5%">Ring Road</div>' +
+    '<div class="map-label" style="top:52%;left:5%">Airport Rd</div>' +
+    '<div class="map-label" style="top:12%;left:64%">Oxford St</div>' +
+    '<div class="map-pin pickup" id="pin-pickup" style="left:15%;top:48%;transform:rotate(-45deg)"><i class="ti ti-home" style="transform:rotate(45deg);font-size:12px"></i></div>' +
+    '<div class="map-pin dropoff" id="pin-drop" style="left:68%;top:22%;transform:rotate(-45deg)"><i class="ti ti-flag" style="transform:rotate(45deg);font-size:12px"></i></div>' +
+    '<div class="map-pin driver" id="pin-driver" style="left:30%;top:42%;transform:rotate(-45deg);transition:left 2s ease,top 2s ease"><i class="ti ti-motorbike" style="transform:rotate(45deg);font-size:12px"></i></div>' +
+    '<div class="map-overlay">' +
+      '<div style="font-size:11px;color:var(--gray500);font-weight:500">ETA</div>' +
+      '<div class="map-eta" id="map-eta">12 min</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function startTracking() {
+  var positions = [
+    {x:30, y:42}, {x:38, y:38}, {x:42, y:35}, {x:50, y:32},
+    {x:56, y:28}, {x:62, y:26}, {x:66, y:24}, {x:68, y:22}
+  ];
+  var etaVals = ['11 min','10 min','9 min','7 min','6 min','4 min','2 min','Arriving!'];
+  var distVals = ['1.6 km','1.4 km','1.2 km','1.0 km','0.8 km','0.5 km','0.2 km','50m'];
+  var step = 0;
+  state.trackInterval = setInterval(function() {
+    if(step >= positions.length) { clearInterval(state.trackInterval); return; }
+    var p = positions[step];
+    var pin = document.getElementById('pin-driver');
+    if(pin) {
+      pin.style.left = p.x + '%';
+      pin.style.top = p.y + '%';
+    }
+    var etaEl = document.getElementById('eta-val');
+    if(etaEl) etaEl.textContent = etaVals[step];
+    var mapEta = document.getElementById('map-eta');
+    if(mapEta) mapEta.textContent = etaVals[step];
+    var distEl = document.getElementById('dist-val');
+    if(distEl) distEl.textContent = distVals[step];
+    step++;
+  }, 2500);
+}
+
+// PROFILE
+screens['profile'] = function() {
+  return '<div class="fade-in" style="max-width:500px"><div class="card">' +
+    '<div class="card-body" style="text-align:center;padding:28px">' +
+      '<div style="width:72px;height:72px;border-radius:50%;background:var(--brand-light);color:var(--brand);font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">AK</div>' +
+      '<div style="font-size:18px;font-weight:700">Ama Kuffour</div>' +
+      '<div style="font-size:14px;color:var(--gray500);margin-bottom:4px">+233 24 567 8901</div>' +
+      '<div style="font-size:13px;color:var(--gray500)">ama.kuffour@gmail.com</div>' +
+      '<div style="display:flex;justify-content:center;gap:20px;margin:20px 0;padding:16px 0;border-top:1px solid var(--gray100);border-bottom:1px solid var(--gray100)">' +
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700">24</div><div style="font-size:11px;color:var(--gray400)">Bookings</div></div>' +
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700">4.8</div><div style="font-size:11px;color:var(--gray400)">Rating</div></div>' +
+        '<div style="text-align:center"><div style="font-size:20px;font-weight:700">GHS 342</div><div style="font-size:11px;color:var(--gray400)">Total spent</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="padding:0 20px 20px;display:grid;gap:12px">' +
+      '<div class="form-group"><label class="form-label">Full name</label><input class="form-input" value="Ama Kuffour"></div>' +
+      '<div class="form-group"><label class="form-label">Phone number</label><input class="form-input" value="+233 24 567 8901"></div>' +
+      '<div class="form-group"><label class="form-label">Email</label><input class="form-input" value="ama.kuffour@gmail.com"></div>' +
+      '<div class="form-group"><label class="form-label">Preferred language</label>' +
+        '<select class="form-input form-select"><option>English</option><option>Twi (Akan)</option><option>Ga</option></select>' +
+      '</div>' +
+      '<button class="btn btn-primary btn-full"><i class="ti ti-check"></i> Save changes</button>' +
+    '</div>' +
+  '</div></div>';
+};
+
+// DRIVER HOME
+screens['driver-home'] = function() {
+  return '<div class="fade-in">' +
+  '<div class="grid2" style="margin-bottom:20px">' +
+    '<div class="card"><div class="card-body">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
+        '<div><div style="font-size:13px;color:var(--gray500);margin-bottom:4px;font-weight:500">You are</div>' +
+          '<div style="font-size:22px;font-weight:700" id="online-status-text">'+(state.driverOnline?'<span style="color:var(--green)">Online ✓</span>':'<span style="color:var(--gray400)">Offline</span>')+'</div>' +
+        '</div>' +
+        '<div class="online-toggle" id="driver-toggle" onclick="toggleDriver()">' +
+          '<div class="toggle-switch'+(state.driverOnline?' on':'')+'" id="toggle-sw"></div>' +
+          '<span style="font-size:13px;font-weight:500" id="toggle-label">'+(state.driverOnline?'Go offline':'Go online')+'</span>' +
+        '</div>' +
+      '</div>' +
+      (state.driverOnline ? '<div style="background:var(--green-light);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:#166534"><i class="ti ti-map-pin"></i> Receiving orders in Accra Central</div>' : '<div style="background:var(--gray50);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--gray500)">Toggle to start receiving orders</div>') +
+    '</div></div>' +
+    '<div class="card"><div class="card-body">' +
+      '<div style="font-size:13px;color:var(--gray500);font-weight:500;margin-bottom:4px">Today\'s earnings</div>' +
+      '<div style="font-size:32px;font-weight:700;color:var(--gray800);margin-bottom:8px">GHS 127.50</div>' +
+      '<div style="display:flex;gap:12px">' +
+        '<div><div style="font-size:20px;font-weight:600">8</div><div style="font-size:11px;color:var(--gray400)">Trips</div></div>' +
+        '<div><div style="font-size:20px;font-weight:600">4.9 ⭐</div><div style="font-size:11px;color:var(--gray400)">Today\'s avg</div></div>' +
+      '</div>' +
+      '<button class="btn btn-outline btn-sm" style="margin-top:12px;width:100%" onclick="navigateTo(\'earnings\')"><i class="ti ti-wallet"></i> View wallet</button>' +
+    '</div></div>' +
+  '</div>' +
+  (state.driverOnline ? newOrderOfferCard() : '') +
+  '<div class="grid2">' +
+    '<div class="card"><div class="card-header"><span class="card-title">Today\'s trips</span></div>' +
+      '<div style="padding:0 4px">' +
+        bookingRow('DLV-00044','Dansoman → Circle','10:20am','GHS 18.00','delivered') +
+        bookingRow('DLV-00043','Lapaz → Achimota','9:05am','GHS 22.50','delivered') +
+        bookingRow('DLV-00042','Tema → Accra Mall','8:30am','GHS 35.00','delivered') +
+      '</div>' +
+    '</div>' +
+    '<div class="card"><div class="card-body">' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:14px">This week</div>' +
+      '<div style="display:grid;gap:10px">' +
+        earningsBar('Mon','GHS 95','60') + earningsBar('Tue','GHS 142','88') + earningsBar('Wed','GHS 78','50') +
+        earningsBar('Thu','GHS 165','100') + earningsBar('Fri','GHS 127','80') +
+      '</div>' +
+    '</div></div>' +
+  '</div></div>';
+};
+
+function earningsBar(day, amount, pct) {
+  return '<div style="display:flex;align-items:center;gap:10px"><div style="width:28px;font-size:12px;color:var(--gray500)">'+day+'</div>' +
+    '<div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:'+pct+'%"></div></div>' +
+    '<div style="width:70px;font-size:12px;font-weight:500;text-align:right">'+amount+'</div></div>';
+}
+
+function newOrderOfferCard() {
+  return '<div class="order-offer fade-in" style="margin-bottom:20px" id="offer-card">' +
+    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">' +
+      '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">New order!</div>' +
+        '<div style="font-size:16px;font-weight:700;margin-bottom:4px">Osu → Airport Residential</div>' +
+        '<div style="font-size:13px;color:var(--gray500)">2.4 km · Documents · Small</div>' +
+      '</div>' +
+      '<div style="text-align:right"><div style="font-size:24px;font-weight:800;color:var(--green)">GHS 22.00</div>' +
+        '<div style="font-size:11px;color:var(--gray400)">100% yours</div></div>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;gap:12px">' +
+      '<div class="offer-timer" id="offer-timer">60</div>' +
+      '<div style="flex:1;display:flex;gap:8px">' +
+        '<button class="btn btn-danger btn-sm" style="flex:1" onclick="declineOffer()"><i class="ti ti-x"></i> Decline</button>' +
+        '<button class="btn btn-primary btn-sm" style="flex:1;background:var(--green)" onclick="acceptOffer()"><i class="ti ti-check"></i> Accept</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function setupDriverToggle() {
+  // already in HTML onclick
+}
+function toggleDriver() {
+  state.driverOnline = !state.driverOnline;
+  document.getElementById('online-status-text').innerHTML = state.driverOnline ?
+    '<span style="color:var(--green)">Online ✓</span>' : '<span style="color:var(--gray400)">Offline</span>';
+  var sw = document.getElementById('toggle-sw');
+  var lbl = document.getElementById('toggle-label');
+  if(sw) sw.className = 'toggle-switch' + (state.driverOnline ? ' on' : '');
+  if(lbl) lbl.textContent = state.driverOnline ? 'Go offline' : 'Go online';
+
+  if(state.driverOnline) {
+    triggerNotif('📍 You are now online', 'You will start receiving orders in Accra Central.');
+    setTimeout(function() {
+      var statusDiv = document.querySelector('[style*="Receiving orders"], [style*="Toggle to"]');
+      if(statusDiv) statusDiv.innerHTML = '<div style="background:var(--green-light);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:#166534"><i class="ti ti-map-pin"></i> Receiving orders in Accra Central</div>';
+      // Inject offer card
+      var content = document.getElementById('main-content');
+      var existing = document.getElementById('offer-card');
+      if(!existing && content) {
+        var div = document.createElement('div');
+        div.innerHTML = newOrderOfferCard();
+        content.insertBefore(div.firstChild, content.children[1]);
+        startOfferTimer();
+      }
+    }, 2000);
+  }
+}
+
+function startOfferTimer() {
+  var t = 60;
+  var interval = setInterval(function() {
+    t--;
+    var el = document.getElementById('offer-timer');
+    if(!el) { clearInterval(interval); return; }
+    el.textContent = t;
+    if(t <= 0) {
+      clearInterval(interval);
+      var card = document.getElementById('offer-card');
+      if(card) card.remove();
+    }
+  }, 1000);
+}
+
+function acceptOffer() {
+  var card = document.getElementById('offer-card');
+  if(card) card.remove();
+  state.bookingStatus = 'accepted';
+  triggerNotif('✅ Order accepted!', 'Head to Osu to pick up the package.');
+  navigateTo('active-trip');
+}
+function declineOffer() {
+  var card = document.getElementById('offer-card');
+  if(card) {
+    card.style.opacity = '0';
+    card.style.transition = 'opacity 0.3s';
+    setTimeout(function(){ if(card.parentNode) card.parentNode.removeChild(card); }, 300);
+  }
+}
+
+// ACTIVE TRIP
+screens['active-trip'] = function() {
+  return '<div class="fade-in" style="max-width:600px">' +
+  '<div class="card" style="margin-bottom:16px">' +
+    '<div class="card-header">' +
+      '<div><div class="card-title">Active trip — DLV-00049</div><div style="font-size:12px;color:var(--gray400)">Osu Oxford St → Airport Residential</div></div>' +
+      '<span class="badge amber pulsing"><i class="ti ti-navigation"></i> En route</span>' +
+    '</div>' +
+    '<div class="card-body">' +
+      '<div class="map-container" style="height:240px;margin-bottom:16px">'+buildMap()+'</div>' +
+      '<div class="grid3" style="text-align:center;margin-bottom:16px">' +
+        '<div><div style="font-size:11px;color:var(--gray400)">Distance</div><div style="font-size:20px;font-weight:700">2.4 km</div></div>' +
+        '<div><div style="font-size:11px;color:var(--gray400)">ETA</div><div style="font-size:20px;font-weight:700;color:var(--brand)">12 min</div></div>' +
+        '<div><div style="font-size:11px;color:var(--gray400)">Fare</div><div style="font-size:20px;font-weight:700;color:var(--green)">GHS 22</div></div>' +
+      '</div>' +
+      '<div style="background:var(--gray50);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">' +
+        '<div style="font-size:12px;color:var(--gray500);font-weight:500;margin-bottom:6px">CUSTOMER</div>' +
+        '<div style="font-weight:600">Ama Kuffour</div>' +
+        '<div style="font-size:13px;color:var(--gray500)">+233 24 567 8901 · Documents · Small</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card"><div class="card-body">' +
+    '<div id="trip-action-area">' + tripActionArea(0) + '</div>' +
+  '</div></div></div>';
+};
+
+var tripStages = [
+  { label:'Confirm arrival at pickup', sub:'Arrive at Osu Oxford Street', action:'I have arrived at pickup', btn:'Arrived at pickup', btnCls:'btn-outline', icon:'ti-map-pin' },
+  { label:'Collect package from sender', sub:'Get the package from Ama', action:'Confirm pickup', btn:'Package collected ✓', btnCls:'btn-primary', icon:'ti-package' },
+  { label:'En route to delivery', sub:'Navigate to Airport Residential', action:'Start delivery', btn:'Starting delivery', btnCls:'btn-primary', icon:'ti-navigation' },
+  { label:'Confirm delivery', sub:'Hand over at destination', action:'Confirm delivery', btn:'Delivery complete ✓', btnCls:'btn-primary', icon:'ti-check' },
+];
+var tripStage = 0;
+
+function tripActionArea(stage) {
+  if(stage >= tripStages.length) {
+    return '<div style="text-align:center;padding:20px">' +
+      '<div style="font-size:40px;margin-bottom:12px">🎉</div>' +
+      '<div style="font-size:18px;font-weight:700;margin-bottom:8px">Trip complete!</div>' +
+      '<div style="font-size:14px;color:var(--gray500);margin-bottom:16px">GHS 22.00 added to your wallet</div>' +
+      '<button class="btn btn-primary btn-full" onclick="navigateTo(\'earnings\')"><i class="ti ti-wallet"></i> View earnings</button>' +
+    '</div>';
+  }
+  var s = tripStages[stage];
+  var stepsHtml = tripStages.map(function(st, i) {
+    var cls = i < stage ? 'done' : (i === stage ? 'active' : '');
+    return '<div class="step '+cls+'" style="flex-direction:column;text-align:center;flex:1">' +
+      '<div class="step-num">'+(i < stage ? '<i class="ti ti-check" style="font-size:10px"></i>' : (i+1))+'</div>' +
+      '<div style="font-size:10px;margin-top:4px;max-width:60px">'+['Arrive','Pickup','Navigate','Deliver'][i]+'</div>' +
+    '</div>' + (i < tripStages.length-1 ? '<div class="step-line'+(i < stage?' done':'')+'"></div>' : '');
+  }).join('');
+  return '<div class="steps" style="margin-bottom:20px">'+stepsHtml+'</div>' +
+    '<div style="text-align:center;padding:16px 0;margin-bottom:16px;border:2px dashed var(--brand-light);border-radius:var(--radius)">' +
+      '<i class="ti '+s.icon+'" style="font-size:32px;color:var(--brand);margin-bottom:8px;display:block"></i>' +
+      '<div style="font-size:16px;font-weight:600;margin-bottom:4px">'+s.label+'</div>' +
+      '<div style="font-size:13px;color:var(--gray500)">'+s.sub+'</div>' +
+    '</div>' +
+    '<button class="btn '+s.btnCls+' btn-lg btn-full" onclick="advanceTripStage()"><i class="ti '+s.icon+'"></i> '+s.btn+'</button>';
+}
+
+function advanceTripStage() {
+  tripStage++;
+  var area = document.getElementById('trip-action-area');
+  if(area) area.innerHTML = tripActionArea(tripStage);
+  if(tripStage === tripStages.length) {
+    triggerNotif('💰 Payment received', 'GHS 22.00 added to your wallet for DLV-00049');
+  }
+}
+function startTripTimer() { /* tracking already in track screen */ }
+
+// EARNINGS
+screens['earnings'] = function() {
+  return '<div class="fade-in">' +
+  '<div class="grid4" style="margin-bottom:20px">' +
+    statCard('Wallet balance','GHS 284.50','<button class="btn btn-primary btn-sm" style="margin-top:8px;width:100%" onclick="showWithdraw()"><i class="ti ti-send"></i> Withdraw</button>') +
+    statCard('Today','GHS 127.50','<span class="stat-change up"><i class="ti ti-trending-up"></i> 8 trips</span>') +
+    statCard('This week','GHS 607.00','<span class="stat-change up"><i class="ti ti-trending-up"></i> +12% vs last week</span>') +
+    statCard('This month','GHS 2,340','<span class="stat-change up"><i class="ti ti-trending-up"></i> 142 trips</span>') +
+  '</div>' +
+  '<div id="withdraw-area"></div>' +
+  '<div class="card"><div class="card-header"><span class="card-title">Transaction history</span>' +
+    '<select class="form-input form-select" style="width:auto;padding:6px 28px 6px 10px;font-size:13px"><option>All time</option><option>This week</option><option>Today</option></select></div>' +
+    '<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Trip</th><th>Date</th><th>Amount</th><th>Type</th></tr></thead><tbody>' +
+      txRow('DLV-00049','Today 2:30pm','+GHS 22.00','credit') +
+      txRow('DLV-00048','Today 11:20am','+GHS 28.50','credit') +
+      txRow('Withdrawal','Today 9:00am','-GHS 200.00','debit') +
+      txRow('DLV-00047','Yesterday','+GHS 45.00','credit') +
+      txRow('DLV-00046','Yesterday','+GHS 62.00','credit') +
+    '</tbody></table></div></div></div>';
+};
+
+function txRow(ref, date, amount, type) {
+  var color = type === 'credit' ? 'var(--green)' : 'var(--red)';
+  return '<tr><td>'+ref+'</td><td style="color:var(--gray500)">'+date+'</td><td style="font-weight:600;color:'+color+'">'+amount+'</td><td><span class="chip '+(type==='credit'?'green':'red')+'">'+type+'</span></td></tr>';
+}
+
+function showWithdraw() {
+  var area = document.getElementById('withdraw-area');
+  if(!area) return;
+  area.innerHTML = '<div class="card fade-in" style="margin-bottom:20px"><div class="card-header"><span class="card-title">Withdraw to mobile money</span></div><div class="card-body">' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label">Amount (GHS)</label><input class="form-input" value="200" placeholder="Min GHS 5"></div>' +
+      '<div class="form-group"><label class="form-label">Network</label><select class="form-input form-select"><option>MTN Mobile Money</option><option>Vodafone Cash</option><option>AirtelTigo Money</option></select></div>' +
+    '</div>' +
+    '<div class="form-group"><label class="form-label">Mobile money number</label><input class="form-input" value="+233 24 567 8900" placeholder="+233..."></div>' +
+    '<div style="display:flex;gap:10px">' +
+      '<button class="btn btn-secondary" onclick="document.getElementById(\'withdraw-area\').innerHTML=\'\'">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="doWithdraw()"><i class="ti ti-send"></i> Withdraw GHS 200</button>' +
+    '</div>' +
+  '</div></div>';
+}
+
+function doWithdraw() {
+  var area = document.getElementById('withdraw-area');
+  if(area) {
+    area.innerHTML = '<div class="card" style="margin-bottom:20px;border-color:var(--green)"><div class="card-body" style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px">✅</div><div><div style="font-weight:600">Withdrawal successful</div><div style="font-size:13px;color:var(--gray500)">GHS 200.00 sent to +233 24 567 8900 (MTN MoMo)</div></div></div></div>';
+    triggerNotif('💸 Withdrawal processed', 'GHS 200.00 sent to your MTN Mobile Money account.');
+  }
+}
+
+// TRIP HISTORY
+screens['trip-history'] = function() {
+  var trips = [
+    ['DLV-00049','Osu → Airport Res.','Today 2:15pm','GHS 22.00','4.9'],
+    ['DLV-00048','Madina → East Legon','Today 11:00am','GHS 28.50','5.0'],
+    ['DLV-00047','Circle → Dansoman','Yesterday','GHS 18.00','4.8'],
+    ['DLV-00046','Tema → Accra','Dec 28','GHS 35.00','5.0'],
+    ['DLV-00045','Lapaz → Achimota','Dec 27','GHS 22.00','4.7'],
+  ];
+  var rows = trips.map(function(t) {
+    return '<tr><td><span style="font-weight:500">'+t[1]+'</span><br><span style="font-size:11px;color:var(--gray400)">'+t[0]+'</span></td>' +
+      '<td>'+t[2]+'</td>' +
+      '<td style="font-weight:600;color:var(--green)">'+t[3]+'</td>' +
+      '<td>'+('⭐'.repeat(Math.round(parseFloat(t[4]))))+' <span style="font-size:12px;color:var(--gray400)">'+t[4]+'</span></td>' +
+      '<td><button class="btn btn-secondary btn-sm">Receipt</button></td></tr>';
+  }).join('');
+  return '<div class="fade-in"><div class="card"><div class="card-header"><span class="card-title">Trip history</span></div>' +
+    '<table class="data-table"><thead><tr><th>Route</th><th>Date</th><th>Earned</th><th>Rating</th><th></th></tr></thead>' +
+    '<tbody>'+rows+'</tbody></table></div></div>';
+};
+
+// DRIVER PROFILE
+screens['driver-profile'] = function() {
+  return '<div class="fade-in" style="max-width:560px">' +
+  // Profile header card
+  '<div class="card" style="margin-bottom:16px"><div class="card-body" style="text-align:center;padding:24px">' +
+    '<div style="width:68px;height:68px;border-radius:50%;background:var(--amber-light);font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px">🏍️</div>' +
+    '<div style="font-size:18px;font-weight:700">Kwame Asante</div>' +
+    '<div style="display:flex;justify-content:center;gap:4px;margin:6px 0">' +
+      '<i class="ti ti-star" style="color:var(--amber)"></i>'.repeat(5) +
+      '<span style="font-size:13px;color:var(--gray500)"> 4.9 (312 trips)</span>' +
+    '</div>' +
+    '<span class="chip green">✓ KYC Verified</span> <span class="chip brand">⭐ Verified driver</span>' +
+    '<div style="display:flex;justify-content:center;gap:24px;margin:16px 0 0;padding:14px 0;border-top:1px solid var(--gray100)">' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700">312</div><div style="font-size:11px;color:var(--gray400)">Trips</div></div>' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700">4.9</div><div style="font-size:11px;color:var(--gray400)">Rating</div></div>' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700">98%</div><div style="font-size:11px;color:var(--gray400)">Completion</div></div>' +
+    '</div>' +
+  '</div></div>' +
+
+  // Onboarding checklist card
+  '<div class="card" style="margin-bottom:16px">' +
+    '<div class="card-header"><span class="card-title">Onboarding document checklist</span>' +
+      '<span class="chip green">All verified ✓</span>' +
+    '</div>' +
+    '<div style="padding:0">' +
+      driverDocRow('ti-id-badge','Ghana Card','var(--brand)','Verified via Smile ID · expires Dec 2029','verified') +
+      driverDocRow('ti-license',"Driver's licence",'var(--teal)','DVLA Ghana · Class B · expires Jun 2027','verified') +
+      driverDocRow('ti-certificate','Vehicle / motorbike registration','var(--purple)','GT-2345-21 · Honda CB125 · 2021','verified') +
+      driverDocRow('ti-shield-check','Auto insurance','var(--amber)','Vanguard Assurance · expires Mar 2025 ⚠️','expiring') +
+    '</div>' +
+    '<div style="padding:12px 16px;background:var(--amber-light);display:flex;align-items:center;gap:8px">' +
+      '<i class="ti ti-alert-triangle" style="color:var(--amber);font-size:16px"></i>' +
+      '<div style="font-size:12px;color:#92400E"><strong>Insurance expiring soon.</strong> Driver will be reminded 30 days before expiry to upload a renewed policy. They will be suspended if it lapses.</div>' +
+    '</div>' +
+  '</div>' +
+
+  // Vehicle & personal info
+  '<div class="card"><div style="padding:0 20px 20px;padding-top:16px;display:grid;gap:12px">' +
+    '<div class="form-group"><label class="form-label">Vehicle type</label><select class="form-input form-select"><option>Motorbike</option><option>Car</option><option>Van</option></select></div>' +
+    '<div class="form-group"><label class="form-label">Vehicle registration number</label><input class="form-input" value="GT-2345-21"></div>' +
+    '<div class="form-group"><label class="form-label">Vehicle make, model & colour</label><input class="form-input" value="Honda CB125 · Red · 2021"></div>' +
+    '<div class="form-group"><label class="form-label">Mobile money number (for payouts)</label><input class="form-input" value="+233 24 567 8900"></div>' +
+    '<button class="btn btn-primary btn-full"><i class="ti ti-check"></i> Save changes</button>' +
+  '</div></div></div>';
+};
+
+function driverDocRow(icon, label, color, detail, status) {
+  var sc = status==='verified'?'green':status==='expiring'?'amber':'red';
+  var st = status==='verified'?'Verified':status==='expiring'?'Expiring soon':'Missing';
+  return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--gray100)">' +
+    '<div style="width:36px;height:36px;border-radius:var(--radius-sm);background:'+color+'22;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+      '<i class="ti '+icon+'" style="font-size:16px;color:'+color+'"></i></div>' +
+    '<div style="flex:1"><div style="font-size:13.5px;font-weight:600">'+label+'</div>' +
+      '<div style="font-size:12px;color:var(--gray400)">'+detail+'</div></div>' +
+    '<span class="chip '+sc+'">'+st+'</span>' +
+  '</div>';
+}
+
+// SMS DEMO
+screens['sms-demo'] = function() {
+  return '<div class="fade-in"><div class="grid2">' +
+    '<div class="card">' +
+      '<div class="card-header">' +
+        '<span class="card-title">SMS driver interface</span>' +
+        '<span class="badge amber">Kofi Acheampong · SMS driver</span>' +
+      '</div>' +
+      '<div style="padding:10px 14px;background:var(--gray50);border-bottom:1px solid var(--gray100);display:flex;gap:8px">' +
+        '<button class="btn btn-secondary btn-sm" onclick="loadScenario(\'standard\')">Standard order (GHS 24)</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="loadScenario(\'momo\')">High-value order (GHS 38) — MoMo</button>' +
+      '</div>' +
+      '<div id="sms-thread" class="sms-thread"></div>' +
+      '<div style="padding:12px;border-top:1px solid var(--gray100);display:flex;gap:8px">' +
+        '<input class="form-input" id="sms-input" placeholder="Type YES, NO, PICKUP, DONE, PAID, HELP..." style="flex:1">' +
+        '<button class="btn btn-primary" onclick="sendSMS()"><i class="ti ti-send"></i></button>' +
+      '</div>' +
+    '</div>' +
+    '<div>' +
+      '<div class="card" style="margin-bottom:14px"><div class="card-header"><span class="card-title">Command reference</span></div><div class="card-body">' +
+        '<div style="font-size:12px;color:var(--gray500);margin-bottom:10px">Type any command — all case-insensitive:</div>' +
+        cmds([['YES','Accept the current order offer'],['NO','Decline the current order offer'],['PICKUP','Confirm package collected from sender'],['DONE','Confirm delivery completed'],['PAID','Confirm MoMo payment received (high-value orders)'],['STATUS','Get your current order details'],['HELP','Command list in English'],['HELP TW','Command list in Twi (Akan)'],['HELP GA','Command list in Ga']]) +
+      '</div></div>' +
+      '<div class="card" style="border-color:var(--purple)"><div class="card-header"><span class="card-title" style="color:var(--purple)">📱 MoMo payment — orders over GHS 25</span></div><div class="card-body">' +
+        '<div style="font-size:12px;color:var(--gray600);line-height:1.6">' +
+          '<p style="margin-bottom:8px">When a fare exceeds <strong>GHS 25</strong>, cash cannot be used. For SMS drivers who cannot process card or MoMo in-app, the system handles this automatically:</p>' +
+          '<div style="display:grid;gap:6px">' +
+            momoStep('1','Customer receives a MoMo payment request SMS with the platform number and booking reference') +
+            momoStep('2','Customer sends payment to 0300000001 (Delivr GH) with the booking reference') +
+            momoStep('3','Customer texts PAID DLV-XXXXX to confirm') +
+            momoStep('4','System verifies the payment via Paystack before notifying the driver to proceed') +
+            momoStep('5','Driver texts DONE on delivery — wallet credited as normal') +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:10px;padding:8px 10px;background:var(--purple-light);border-radius:var(--radius-sm);font-size:11.5px;color:#5B21B6">Try it: click "High-value order (GHS 38)" above then reply YES to see the full MoMo flow.</div>' +
+      '</div></div>' +
+    '</div>' +
+  '</div></div>';
+};
+
+function momoStep(n, text) {
+  return '<div style="display:flex;gap:8px;align-items:flex-start">' +
+    '<div style="width:18px;height:18px;border-radius:50%;background:var(--purple-light);color:#5B21B6;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">'+n+'</div>' +
+    '<div style="font-size:12px">'+text+'</div>' +
+  '</div>';
+}
+
+function cmds(list) {
+  return list.map(function(c) {
+    return '<div style="display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid var(--gray100)">' +
+      '<code style="background:var(--brand-light);color:var(--brand);padding:2px 8px;border-radius:4px;font-size:11px;font-family:monospace;flex-shrink:0">'+c[0]+'</code>' +
+      '<span style="font-size:12.5px;color:var(--gray600)">'+c[1]+'</span>' +
+    '</div>';
+  }).join('');
+}
+
+var smsScenario = 'standard';
+
+var smsFlows = {
+  standard: {
+    START: 'DelivrGH NEW ORDER #DLV-00050: Pickup: Accra Central Post Office. Drop: East Legon Total. GHS 24.00. Cash on delivery. Reply YES to accept or NO to decline. Expires 60 sec.',
+    YES:    'DelivrGH: ✅ Order DLV-00050 ACCEPTED. Head to Accra Central PO. Customer: Ama (+233 24 567 8901). GHS 24.00 cash on delivery. Text PICKUP when you have the package.',
+    NO:     'DelivrGH: Order DLV-00050 declined. Next available order will be sent shortly.',
+    PICKUP: 'DelivrGH: ✅ Pickup confirmed — DLV-00050. Navigate to East Legon Total. Collect GHS 24.00 cash at delivery. Text DONE when delivered.',
+    DONE:   'DelivrGH: ✅ Delivery complete! Cash receipt confirmed. Great job, Kofi! 🎉 Balance unchanged (cash order).',
+    STATUS: 'DelivrGH STATUS: DLV-00050 · Pickup: Accra Central PO · Drop: East Legon Total · GHS 24.00 Cash · Accepted. Text PICKUP when collected.',
+    PAID:   'DelivrGH: PAID command is for mobile money orders only. This is a cash order (GHS 24.00).',
+    HELP:   'DelivrGH COMMANDS: YES=accept | NO=decline | PICKUP=collected | DONE=delivered | PAID=momo confirmed | STATUS=details | HELP TW=Twi | HELP GA=Ga',
+    'HELP TW': 'DelivrGH (Twi): YES=gye order | NO=gyae | PICKUP=me de pakiti | DONE=me de kɔ | PAID=sika kɔe | STATUS=nsɛm | Wo ne Delivr GH!',
+    'HELP GA': 'DelivrGH (Ga): YES=tɛ order | NO=ŋmɛ | PICKUP=mi sɛ pakiti | DONE=mi dzɔ | PAID=sika gbɛ | STATUS=info | Afi Delivr GH!'
+  },
+  momo: {
+    START: 'DelivrGH NEW ORDER #DLV-00051: Pickup: Osu Oxford St. Drop: East Legon Shell. GHS 38.00. ⚠️ Mobile Money payment required (above GHS 25 limit). Reply YES to accept or NO to decline.',
+    YES:   'DelivrGH: ✅ Order DLV-00051 ACCEPTED. Head to Osu Oxford St. Customer: Kofi (+233 20 123 4567). ⚠️ DO NOT collect cash — customer will pay via MoMo. Await payment confirmation before pickup. Text PICKUP once notified.',
+    NO:    'DelivrGH: Order DLV-00051 declined. Next available order will be sent shortly.',
+    PICKUP:'DelivrGH: ✅ Pickup confirmed — DLV-00051. Navigate to East Legon Shell. Text DONE when delivered. GHS 38.00 will be credited to your wallet.',
+    DONE:  'DelivrGH: ✅ Delivery complete! GHS 38.00 credited to your wallet. New balance: GHS 346.50. Great job, Kofi! 🎉',
+    STATUS:'DelivrGH STATUS: DLV-00051 · Pickup: Osu Oxford St · Drop: East Legon Shell · GHS 38.00 MoMo · Awaiting payment confirmation.',
+    PAID:  'DelivrGH: ✅ MoMo payment of GHS 38.00 verified for DLV-00051. Funds secured. You may now proceed to pickup. Text PICKUP when package is collected.',
+    HELP:  'DelivrGH COMMANDS: YES=accept | NO=decline | PICKUP=collected | DONE=delivered | PAID=momo confirmed | STATUS=details | HELP TW=Twi | HELP GA=Ga',
+    'HELP TW': 'DelivrGH (Twi): YES=gye order | NO=gyae | PICKUP=me de pakiti | DONE=me de kɔ | PAID=sika kɔe | STATUS=nsɛm | Wo ne Delivr GH!',
+    'HELP GA': 'DelivrGH (Ga): YES=tɛ order | NO=ŋmɛ | PICKUP=mi sɛ pakiti | DONE=mi dzɔ | PAID=sika gbɛ | STATUS=info | Afi Delivr GH!'
+  }
+};
+// Active flow defaults to standard
+var smsFlow = smsFlows.standard;
+
+function loadScenario(type) {
+  smsScenario = type;
+  smsFlow = smsFlows[type];
+  var thread = document.getElementById('sms-thread');
+  if(thread) {
+    thread.innerHTML = '';
+    addSMSBubble('in', smsFlow.START);
+    // For momo scenario, also add the customer-side payment request after a short delay
+    if(type === 'momo') {
+      setTimeout(function() {
+        addSMSBubble('in', 'DelivrGH (to customer Kofi): Your delivery DLV-00051 is GHS 38.00. Send MoMo to: 0300000001 (Delivr GH). Reference: DLV00051. Then text PAID DLV00051 to confirm. Your driver is waiting.');
+      }, 1500);
+    }
+  }
+}
+
+function setupSMSDemo() {
+  var thread = document.getElementById('sms-thread');
+  if(!thread) return;
+  smsFlow = smsFlows.standard;
+  addSMSBubble('in', smsFlow.START);
+  document.getElementById('sms-input').addEventListener('keydown', function(e) {
+    if(e.key === 'Enter') sendSMS();
+  });
+}
+
+function addSMSBubble(type, text) {
+  var thread = document.getElementById('sms-thread');
+  if(!thread) return;
+  var div = document.createElement('div');
+  div.className = 'sms-bubble sms-' + type;
+  div.textContent = text;
+  thread.appendChild(div);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function sendSMS() {
+  var inp = document.getElementById('sms-input');
+  if(!inp) return;
+  var val = inp.value.trim().toUpperCase();
+  if(!val) return;
+  addSMSBubble('out', inp.value.trim());
+  inp.value = '';
+  setTimeout(function() {
+    // Handle PAID [REF] format
+    var key = val.startsWith('PAID') ? 'PAID' : val;
+    var resp = smsFlow[key];
+    if(resp) {
+      addSMSBubble('in', resp);
+      // After PAID in momo scenario, simulate system verification delay
+      if(key === 'PAID' && smsScenario === 'momo') {
+        setTimeout(function() {
+          addSMSBubble('in', 'DelivrGH SYSTEM: Payment of GHS 38.00 verified via Paystack ✅. Booking DLV-00051 is now active. Safe delivery, Kofi!');
+        }, 1800);
+      }
+    } else {
+      addSMSBubble('in', 'DelivrGH: Unknown command "'+val+'". Text HELP for a list of valid commands.');
+    }
+  }, 800);
+}
+
+// USSD DEMO
+screens['ussd-demo'] = function() {
+  return '<div class="fade-in" style="max-width:480px">' +
+  '<div class="card"><div class="card-header"><span class="card-title">USSD menu demo</span><span class="badge amber">*713#</span></div>' +
+  '<div style="padding:20px">' +
+    '<div style="background:#1E293B;border-radius:var(--radius);padding:0;overflow:hidden;margin-bottom:20px">' +
+      '<div style="background:#334155;padding:10px 16px;font-size:12px;color:#94A3B8;font-family:monospace">USSD Session — *713# — Kofi Acheampong</div>' +
+      '<div id="ussd-screen" style="padding:20px;font-family:monospace;font-size:14px;color:#E2E8F0;min-height:200px;white-space:pre-wrap">'+ussdMain()+'</div>' +
+      '<div style="border-top:1px solid #334155;padding:10px 16px;display:flex;gap:8px">' +
+        '<input id="ussd-input" style="flex:1;background:#334155;border:none;color:#E2E8F0;font-family:monospace;font-size:14px;padding:6px 10px;border-radius:4px;outline:none" placeholder="Enter option...">' +
+        '<button onclick="submitUSSD()" style="background:var(--brand);color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:13px">Send</button>' +
+      '</div>' +
+    '</div>' +
+    '<div style="font-size:13px;color:var(--gray500)"><strong>Try these inputs:</strong> 1 (pending orders), 2 (accept), 4 (mark delivered), 5 (check earnings), 0 (back to main)</div>' +
+  '</div></div></div>';
+};
+
+function ussdMain() {
+  return 'DelivrGH Driver Menu\n\n1. View pending orders\n2. Accept current order\n3. Mark as picked up\n4. Mark as delivered\n5. Check earnings\n6. Go offline\n\n0. Exit';
+}
+var ussdState = 'main';
+function submitUSSD() {
+  var inp = document.getElementById('ussd-input');
+  var screen = document.getElementById('ussd-screen');
+  if(!inp || !screen) return;
+  var val = inp.value.trim();
+  inp.value = '';
+  var responses = {
+    main: {
+      '1': 'Pending Order:\nDLV-00050\nPickup: Accra Central PO\nDrop: East Legon Total\nFare: GHS 24.00\n\nPress 2 to accept\n0. Back',
+      '2': 'Order DLV-00050 ACCEPTED\nHead to pickup location\nAccra Central Post Office\n\nPress 3 when package collected\n0. Back',
+      '3': 'Pickup confirmed.\nNavigate to East Legon Total\n\nPress 4 when delivered\n0. Back',
+      '4': 'DELIVERY CONFIRMED!\nGHS 24.00 credited to wallet\nNew balance: GHS 308.50\n\n0. Back to menu',
+      '5': 'Your Earnings:\nToday:    GHS 127.50\nThis week: GHS 607.00\nWallet balance: GHS 284.50\n\n0. Back',
+      '6': 'You are now OFFLINE\nYou will not receive orders\n\nText ONLINE to go online\n0. Back',
+      '0': null
+    }
+  };
+  var opts = responses[ussdState] || responses['main'];
+  if(val === '0' || !opts[val]) {
+    screen.textContent = ussdMain();
+    ussdState = 'main';
+  } else {
+    screen.textContent = opts[val];
+  }
+}
+
+// SMS HISTORY
+screens['sms-history'] = function() {
+  return '<div class="fade-in"><div class="card"><div class="card-header"><span class="card-title">SMS driver order history</span></div>' +
+  '<table class="data-table"><thead><tr><th>Order</th><th>Route</th><th>Date</th><th>Earned</th><th>Method</th></tr></thead><tbody>' +
+    '<tr><td>DLV-00050</td><td>Accra Central → East Legon</td><td>Today</td><td style="color:var(--green);font-weight:600">GHS 24.00</td><td><span class="chip amber">SMS</span></td></tr>' +
+    '<tr><td>DLV-00041</td><td>Tema → Accra</td><td>Yesterday</td><td style="color:var(--green);font-weight:600">GHS 35.00</td><td><span class="chip amber">SMS</span></td></tr>' +
+    '<tr><td>DLV-00038</td><td>Lapaz → Circle</td><td>Dec 27</td><td style="color:var(--green);font-weight:600">GHS 18.00</td><td><span class="chip amber">USSD</span></td></tr>' +
+  '</tbody></table></div></div>';
+};
+
+// CORPORATE HOME
+screens['corp-home'] = function() {
+  return '<div class="fade-in">' +
+  '<div class="grid4" style="margin-bottom:20px">' +
+    statCard('Deliveries this month','148','<span class="stat-change up"><i class="ti ti-trending-up"></i> +24 vs last month</span>') +
+    statCard('Total spend','GHS 4,320','<span class="stat-change down"><i class="ti ti-trending-down"></i> -3% vs last month</span>') +
+    statCard('Fleet drivers','12','<span class="stat-change"><span style="color:var(--green);font-size:11px">● 8 online now</span></span>') +
+    statCard('Avg delivery time','18 min','<span class="stat-change up"><i class="ti ti-trending-up"></i> -2 min improved</span>') +
+  '</div>' +
+  '<div class="grid2">' +
+    '<div class="card"><div class="card-header"><span class="card-title">Recent deliveries</span><button class="btn btn-secondary btn-sm" onclick="navigateTo(\'corp-deliveries\')">View all</button></div>' +
+      '<div style="padding:0 4px">' +
+        bookingRow('DLV-00049','Ring Road → Osu','Today, 2:15pm','GHS 22.00','active') +
+        bookingRow('DLV-00048','East Legon → Airport','Today, 11:00am','GHS 28.50','delivered') +
+        bookingRow('DLV-00047','Accra → Tema','Yesterday','GHS 45.00','delivered') +
+        bookingRow('DLV-00046','Osu → Madina','Dec 28','GHS 32.00','delivered') +
+      '</div>' +
+    '</div>' +
+    '<div class="card"><div class="card-header"><span class="card-title">Fleet status</span><button class="btn btn-secondary btn-sm" onclick="navigateTo(\'fleet\')">Manage</button></div>' +
+      '<div class="card-body" style="padding:12px 20px">' +
+        fleetRow('Kwame A.','🏍️','Online','Osu → Airport','GT-2345-21') +
+        fleetRow('Yaa M.','🚗','Online','East Legon → Tema','GW-4521-19') +
+        fleetRow('Kojo O.','🏍️','Online','Idle','GN-7823-22') +
+        fleetRow('Esi D.','🚐','Offline','—','GT-9912-20') +
+      '</div>' +
+    '</div>' +
+  '</div></div>';
+};
+
+function fleetRow(name, vehicle, status, current, reg) {
+  var dot = status === 'Online' ? '#16A34A' : '#9CA3AF';
+  return '<div class="fleet-row">' +
+    '<div class="driver-avatar">'+name.split(' ').map(function(n){return n[0];}).join('')+'</div>' +
+    '<div style="flex:1"><div style="font-size:13.5px;font-weight:500">'+name+' '+vehicle+'</div>' +
+      '<div style="font-size:12px;color:var(--gray400)">'+reg+' · '+current+'</div></div>' +
+    '<span style="width:8px;height:8px;border-radius:50%;background:'+dot+';display:inline-block;margin-right:4px"></span>' +
+    '<span style="font-size:12px;color:var(--gray500)">'+status+'</span>' +
+  '</div>';
+}
+
+// CORP DELIVERIES
+screens['corp-deliveries'] = function() {
+  var rows = [
+    ['DLV-00049','Ring Road → Osu','Warehouse','Today 2:15pm','GHS 22.00','active'],
+    ['DLV-00048','East Legon → Airport','Finance','Today 11:00am','GHS 28.50','delivered'],
+    ['DLV-00047','Accra → Tema','Sales','Yesterday','GHS 45.00','delivered'],
+    ['DLV-00046','Osu → Madina','HR','Dec 28','GHS 32.00','delivered'],
+    ['DLV-00445','Lapaz → Circle','Marketing','Dec 28','GHS 18.00','delivered'],
+  ].map(function(r) {
+    var sc = r[5]==='active'?'brand':'green';
+    var st = r[5]==='active'?'Live':'Delivered';
+    return '<tr><td><strong>'+r[0]+'</strong></td><td>'+r[1]+'</td><td><span class="chip">'+r[2]+'</span></td><td>'+r[3]+'</td><td><strong>'+r[4]+'</strong></td><td><span class="chip '+sc+'">'+st+'</span></td>' +
+      '<td>'+(r[5]==='active'?'<button class="btn btn-outline btn-sm" onclick="navigateTo(\'track\')">Track</button>':'<button class="btn btn-secondary btn-sm">Receipt</button>')+'</td></tr>';
+  }).join('');
+  return '<div class="fade-in"><div class="card"><div class="card-header"><span class="card-title">All company deliveries</span>' +
+    '<div style="display:flex;gap:8px">' +
+      '<select class="form-input form-select" style="width:auto;padding:6px 28px 6px 10px;font-size:13px"><option>All departments</option><option>Warehouse</option><option>Finance</option><option>Sales</option></select>' +
+      '<button class="btn btn-secondary btn-sm"><i class="ti ti-download"></i> Export CSV</button>' +
+      '<button class="btn btn-primary btn-sm" onclick="navigateTo(\'book\')"><i class="ti ti-plus"></i> New booking</button>' +
+    '</div></div>' +
+    '<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Reference</th><th>Route</th><th>Department</th><th>Date</th><th>Fare</th><th>Status</th><th></th></tr></thead>' +
+    '<tbody>'+rows+'</tbody></table></div></div></div>';
+};
+
+// FLEET
+screens['fleet'] = function() {
+  return '<div class="fade-in">' +
+  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
+    '<div style="font-size:14px;color:var(--gray500)">12 drivers registered · 8 online now</div>' +
+    '<button class="btn btn-primary btn-sm" onclick="showAddDriver()"><i class="ti ti-user-plus"></i> Add driver</button>' +
+  '</div>' +
+  '<div id="add-driver-area"></div>' +
+  '<div class="card"><div class="card-header"><span class="card-title">Fleet drivers</span></div>' +
+  '<table class="data-table"><thead><tr><th>Driver</th><th>Vehicle</th><th>Status</th><th>Trips (month)</th><th>Rating</th><th>Actions</th></tr></thead><tbody>' +
+    fleetTableRow('Kwame Asante','🏍️ Motorbike','online','28','4.9') +
+    fleetTableRow('Yaa Mensah','🚗 Car','online','22','4.8') +
+    fleetTableRow('Kojo Owusu','🏍️ Motorbike','online','31','5.0') +
+    fleetTableRow('Esi Duodu','🚐 Van','offline','15','4.7') +
+    fleetTableRow('Abena Frimpong','🚗 Car','offline','18','4.9') +
+  '</tbody></table></div></div>';
+};
+
+function fleetTableRow(name, vehicle, status, trips, rating) {
+  var dot = status === 'online' ? 'green' : 'gray';
+  return '<tr>' +
+    '<td><div style="display:flex;align-items:center;gap:8px"><div class="driver-avatar">'+name.split(' ').map(function(n){return n[0];}).join('')+'</div><strong>'+name+'</strong></div></td>' +
+    '<td>'+vehicle+'</td>' +
+    '<td><span class="chip '+dot+'">'+status+'</span></td>' +
+    '<td>'+trips+'</td>' +
+    '<td>⭐ '+rating+'</td>' +
+    '<td><button class="btn btn-secondary btn-sm">View</button> <button class="btn btn-danger btn-sm">Remove</button></td>' +
+  '</tr>';
+}
+
+function showAddDriver() {
+  var area = document.getElementById('add-driver-area');
+  if(!area) return;
+  area.innerHTML = '<div class="card fade-in" style="margin-bottom:16px"><div class="card-header"><span class="card-title">Add driver to fleet</span></div><div class="card-body">' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label">Driver phone number</label><input class="form-input" placeholder="+233 ..."></div>' +
+      '<div class="form-group"><label class="form-label">Department tag</label><input class="form-input" placeholder="e.g. Warehouse"></div>' +
+    '</div>' +
+    '<div style="font-size:12px;color:var(--gray500);margin-bottom:12px">The driver will receive a notification to confirm joining your fleet.</div>' +
+    '<div style="display:flex;gap:10px">' +
+      '<button class="btn btn-secondary" onclick="document.getElementById(\'add-driver-area\').innerHTML=\'\'">Cancel</button>' +
+      '<button class="btn btn-primary" onclick="addDriverDone()"><i class="ti ti-send"></i> Send invite</button>' +
+    '</div>' +
+  '</div></div>';
+}
+function addDriverDone() {
+  var area = document.getElementById('add-driver-area');
+  if(area) area.innerHTML = '<div class="card" style="margin-bottom:16px;border-color:var(--green)"><div class="card-body"><i class="ti ti-check" style="color:var(--green)"></i> Invitation sent. Driver will appear here once they accept.</div></div>';
+}
+
+// ANALYTICS
+screens['analytics'] = function() {
+  return '<div class="fade-in"><div class="grid4" style="margin-bottom:20px">' +
+    statCard('Deliveries / day','4.9','<span class="stat-change up"><i class="ti ti-trending-up"></i> vs 4.2 last month</span>') +
+    statCard('Avg fare','GHS 29.20','') +
+    statCard('On-time rate','94%','<span class="stat-change up"><i class="ti ti-trending-up"></i> +2%</span>') +
+    statCard('Driver utilisation','78%','<span class="stat-change up"><i class="ti ti-trending-up"></i> +5%</span>') +
+  '</div>' +
+  '<div class="grid2">' +
+    '<div class="card"><div class="card-header"><span class="card-title">Spend by department</span></div><div class="card-body" style="padding:16px 20px">' +
+      deptBar('Warehouse','GHS 1,840','80') +
+      deptBar('Sales','GHS 920','40') +
+      deptBar('Finance','GHS 680','30') +
+      deptBar('Marketing','GHS 480','20') +
+      deptBar('HR','GHS 400','17') +
+    '</div></div>' +
+    '<div class="card"><div class="card-header"><span class="card-title">Top 5 drivers</span></div><div class="card-body" style="padding:12px 20px">' +
+      topDriver('Kwame A.','🏍️','28 trips','GHS 840','4.9') +
+      topDriver('Kojo O.','🏍️','31 trips','GHS 930','5.0') +
+      topDriver('Yaa M.','🚗','22 trips','GHS 660','4.8') +
+      topDriver('Esi D.','🚐','15 trips','GHS 750','4.7') +
+      topDriver('Abena F.','🚗','18 trips','GHS 540','4.9') +
+    '</div></div>' +
+  '</div></div>';
+};
+
+function deptBar(dept, amount, pct) {
+  return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>'+dept+'</span><span style="font-weight:500">'+amount+'</span></div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>';
+}
+function topDriver(name, v, trips, earned, rating) {
+  return '<div class="fleet-row"><div class="driver-avatar">'+name.split(' ').map(function(n){return n[0];}).join('')+'</div>' +
+    '<div style="flex:1"><div style="font-size:13.5px;font-weight:500">'+name+' '+v+'</div>' +
+      '<div style="font-size:12px;color:var(--gray400)">'+trips+' · '+earned+'</div></div>' +
+    '<span style="font-size:13px;color:var(--amber)">⭐ '+rating+'</span></div>';
+}
+
+// INVOICES
+screens['invoices'] = function() {
+  return '<div class="fade-in"><div class="card"><div class="card-header"><span class="card-title">Monthly invoices</span></div>' +
+  '<table class="data-table"><thead><tr><th>Month</th><th>Deliveries</th><th>Total spend</th><th>Status</th><th></th></tr></thead><tbody>' +
+    invRow('December 2024','148','GHS 4,320.00','Pending') +
+    invRow('November 2024','122','GHS 3,560.00','Paid') +
+    invRow('October 2024','135','GHS 3,940.00','Paid') +
+    invRow('September 2024','98','GHS 2,860.00','Paid') +
+  '</tbody></table></div></div>';
+};
+function invRow(month, trips, total, status) {
+  var sc = status === 'Pending' ? 'amber' : 'green';
+  return '<tr><td><strong>'+month+'</strong></td><td>'+trips+' deliveries</td><td><strong>'+total+'</strong></td>' +
+    '<td><span class="chip '+sc+'">'+status+'</span></td>' +
+    '<td><button class="btn btn-outline btn-sm"><i class="ti ti-download"></i> PDF</button></td></tr>';
+}
+
+// CORP SETTINGS
+screens['corp-settings'] = function() {
+  return '<div class="fade-in" style="max-width:560px"><div class="card"><div class="card-header"><span class="card-title">Company settings</span></div><div class="card-body" style="display:grid;gap:16px">' +
+    '<div class="form-group"><label class="form-label">Company name</label><input class="form-input" value="Accra Foods Ltd"></div>' +
+    '<div class="form-group"><label class="form-label">Ghana TIN</label><input class="form-input" value="GH-TIN-28374910"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label">Contact email</label><input class="form-input" value="logistics@accrafoods.gh"></div>' +
+      '<div class="form-group"><label class="form-label">Contact phone</label><input class="form-input" value="+233 30 234 5678"></div>' +
+    '</div>' +
+    '<div class="form-group"><label class="form-label">Approval threshold</label><input class="form-input" type="number" value="100"><div class="form-hint">Orders above this amount (GHS) require admin approval before driver matching begins.</div></div>' +
+    '<div class="form-group"><label class="form-label">Department tags</label><input class="form-input" value="Warehouse, Sales, Finance, HR, Marketing"><div class="form-hint">Comma-separated. Used to tag deliveries for reporting.</div></div>' +
+    '<div style="padding:12px;background:var(--gray50);border-radius:var(--radius-sm)"><div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<div><div style="font-size:13.5px;font-weight:500">Send Now, Pay Later</div><div style="font-size:12px;color:var(--gray400)">Dispatch without upfront payment. Monthly invoice.</div></div>' +
+      '<div class="toggle-switch on"></div>' +
+    '</div></div>' +
+    '<button class="btn btn-primary"><i class="ti ti-check"></i> Save settings</button>' +
+  '</div></div></div>';
+};
+
+// NOTIFICATIONS ──────────────────────────────────────────────────────────
+function showNotif() {
+  var popup = document.getElementById('notif-popup');
+  var list = document.getElementById('notif-list');
+  list.innerHTML = state.notifications.map(function(n) {
+    return '<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray100)">' +
+      '<div style="width:32px;height:32px;background:'+(n.unread?'var(--brand-light)':'var(--gray100)')+';border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti '+n.icon+'" style="font-size:14px;color:'+(n.unread?'var(--brand)':'var(--gray500)')+'"></i></div>' +
+      '<div><div style="font-size:13px'+(n.unread?';font-weight:500':'')+'">'+n.text+'</div><div style="font-size:11px;color:var(--gray400)">'+n.time+'</div></div>' +
+    '</div>';
+  }).join('');
+  state.notifications.forEach(function(n){ n.unread = false; });
+  document.getElementById('notif-dot').style.display = 'none';
+  popup.classList.add('show');
+}
+function hideNotif() {
+  document.getElementById('notif-popup').classList.remove('show');
+}
+document.addEventListener('click', function(e) {
+  var popup = document.getElementById('notif-popup');
+  if(popup && !popup.contains(e.target) && !e.target.closest('[onclick="showNotif()"]')) {
+    popup.classList.remove('show');
+  }
+});
+
+function triggerNotif(title, body) {
+  state.notifications.unshift({ icon:'ti-bell', text:title+': '+body, time:'just now', unread:true });
+  document.getElementById('notif-dot').style.display = 'block';
+  var popup = document.getElementById('notif-popup');
+  if(!popup) return;
+  popup.querySelector('#notif-list') && (popup.querySelector('#notif-list').innerHTML = '');
+  // Brief toast
+  popup.innerHTML = '<div style="display:flex;gap:10px;align-items:center">' +
+    '<div style="font-size:22px">'+title.split(' ')[0]+'</div>' +
+    '<div><div style="font-size:13px;font-weight:500">'+title.substring(title.indexOf(' ')+1)+'</div>' +
+    '<div style="font-size:12px;color:var(--gray500)">'+body+'</div></div>' +
+  '</div>';
+  popup.classList.add('show');
+  setTimeout(function(){
+    popup.classList.remove('show');
+    setTimeout(function(){
+      popup.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:14px;font-weight:600">Notifications</span><i class="ti ti-x" style="cursor:pointer;color:var(--gray400)" onclick="hideNotif()"></i></div><div id="notif-list"></div>';
+    }, 400);
+  }, 4000);
+}
+
+// INIT ──────────────────────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  // no-op, landing handles init
+});
+</script>
+</body>
+</html>
