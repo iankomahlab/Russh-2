@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Delivr GH — Interactive Prototype</title>
+<title>Russhit — Interactive App Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -247,7 +247,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- LANDING SCREEN -->
 <div id="landing-screen" class="landing">
   <div class="landing-badge">🇬🇭 Live Prototype — Accra, Ghana</div>
-  <div class="landing-logo">Delivr<span>GH</span></div>
+  <div class="landing-logo">Russhit</div>
   <div class="landing-sub">Fast. Fair. For Everyone. — Interactive Product Demo</div>
   <div class="landing-cards">
     <div class="landing-card" onclick="enterApp('customer')">
@@ -268,7 +268,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="landing-card-desc">No smartphone needed. Receive orders and manage deliveries entirely through SMS and USSD.</div>
       <div style="margin-top:14px"><span style="background:#FCD34D;color:#92400E;font-size:11px;padding:4px 10px;border-radius:20px">⭐ Key differentiator</span></div>
     </div>
-    <div class="landing-card" onclick="enterApp('corporate')">
+    <div class="landing-card" onclick="enterApp('merchant')" style="border:2px solid rgba(255,255,255,0.4)">
+      <div class="landing-card-icon">🏪</div>
+      <div class="landing-card-title">Merchant / Business</div>
+      <div class="landing-card-desc">Restaurants, pharmacies, grocery shops and social media sellers. Book via WhatsApp or app — no technical setup needed.</div>
+      <div style="margin-top:14px"><span style="background:#25D366;color:#fff;font-size:11px;padding:4px 10px;border-radius:20px">📲 WhatsApp-native onboarding</span></div>
+    </div>
+        <div class="landing-card" onclick="enterApp('corporate')">
       <div class="landing-card-icon">🏢</div>
       <div class="landing-card-title">Corporate Portal</div>
       <div class="landing-card-desc">Manage your fleet, track all company deliveries, and access monthly invoices and analytics.</div>
@@ -284,7 +290,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-logo">Delivr<span>GH</span></div>
+      <div class="sidebar-logo">Russhit</div>
       <div class="sidebar-tagline" id="persona-label">Customer Portal</div>
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
@@ -292,7 +298,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="persona-switcher">
         <div class="persona-label">Switch view</div>
         <div class="persona-btns">
-          <div class="persona-btn active" id="pb-customer" onclick="switchPersona('customer')">Customer</div>
+          <div class="persona-btn active" id="pb-merchant" onclick="switchPersona('merchant')">Merchant</div>
+          <div class="persona-btn" id="pb-customer" onclick="switchPersona('customer')">Customer</div>
           <div class="persona-btn" id="pb-driver" onclick="switchPersona('driver')">Driver</div>
           <div class="persona-btn" id="pb-corp" onclick="switchPersona('corporate')">Corp</div>
         </div>
@@ -357,7 +364,20 @@ var state = {
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────
 var navConfigs = {
-  customer: {
+  merchant: {
+    label: 'Merchant Portal', user: "Abena's Pharmacy", initials: 'AP',
+    badge: { text: 'Merchant', cls: 'brand' },
+    nav: [
+      { icon: 'ti-layout-dashboard', label: 'Dashboard', screen: 'merchant-home' },
+      { icon: 'ti-brand-whatsapp', label: 'WhatsApp booking', screen: 'wa-booking' },
+      { icon: 'ti-plus', label: 'Book delivery', screen: 'book' },
+      { icon: 'ti-package', label: 'My deliveries', screen: 'merchant-deliveries' },
+      { icon: 'ti-chart-bar', label: 'Analytics', screen: 'merchant-analytics' },
+      { icon: 'ti-key', label: 'API & integrations', screen: 'merchant-api' },
+      { icon: 'ti-user', label: 'Business profile', screen: 'merchant-profile' },
+    ]
+  },
+    customer: {
     label: 'Customer Portal', user: 'Ama Kuffour', initials: 'AK',
     badge: { text: 'Individual', cls: 'blue' },
     nav: [
@@ -416,9 +436,9 @@ function switchPersona(persona) {
   state.screen = cfg.nav[0].screen;
 
   // update persona buttons
-  ['customer','driver','corp'].forEach(function(p) {
+  ['merchant','customer','driver','corp'].forEach(function(p) {
     var btn = document.getElementById('pb-'+p);
-    if(btn) btn.classList.toggle('active', p === persona || (persona === 'sms' && p === 'driver') || (persona === 'corporate' && p === 'corp'));
+    if(btn) btn.classList.toggle('active', p === persona || (persona === 'sms' && p === 'driver') || (persona === 'corporate' && p === 'corp') || (persona === 'merchant' && p === 'merchant'));
   });
   if(persona === 'sms') {
     document.getElementById('pb-driver').classList.add('active');
@@ -478,6 +498,7 @@ function navigateTo(screen) {
     if(screen === 'track') startTracking();
     if(screen === 'driver-home') setupDriverToggle();
     if(screen === 'sms-demo') setupSMSDemo();
+    if(screen === 'wa-booking') setTimeout(function(){ loadWA('onboard'); }, 150);
     if(screen === 'active-trip' && state.bookingStatus === 'accepted') startTripTimer();
   } else {
     content.innerHTML = '<div class="empty-state"><i class="ti ti-tools"></i><p>Screen coming soon</p></div>';
@@ -823,7 +844,7 @@ screens['track'] = function() {
         '<div class="divider"></div>' +
         '<div style="font-size:12px;color:var(--gray400);margin-bottom:10px">Share tracking link</div>' +
         '<div style="display:flex;gap:8px;align-items:center">' +
-          '<input class="form-input" style="font-size:12px;color:var(--brand)" value="delivrgh.com/t/ABC123XY" readonly>' +
+          '<input class="form-input" style="font-size:12px;color:var(--brand)" value="russhit.com/t/ABC123XY" readonly>' +
           '<button class="btn btn-secondary btn-sm"><i class="ti ti-copy"></i></button>' +
         '</div>' +
         '<div style="font-size:11px;color:var(--gray400);margin-top:6px">Recipient can track without the app</div>' +
@@ -1282,7 +1303,7 @@ screens['sms-demo'] = function() {
           '<p style="margin-bottom:8px">When a fare exceeds <strong>GHS 25</strong>, cash cannot be used. For SMS drivers who cannot process card or MoMo in-app, the system handles this automatically:</p>' +
           '<div style="display:grid;gap:6px">' +
             momoStep('1','Customer receives a MoMo payment request SMS with the platform number and booking reference') +
-            momoStep('2','Customer sends payment to 0300000001 (Delivr GH) with the booking reference') +
+            momoStep('2','Customer sends payment to 0300000001 (Russhit) with the booking reference') +
             momoStep('3','Customer texts PAID DLV-XXXXX to confirm') +
             momoStep('4','System verifies the payment via Paystack before notifying the driver to proceed') +
             momoStep('5','Driver texts DONE on delivery — wallet credited as normal') +
@@ -1314,28 +1335,28 @@ var smsScenario = 'standard';
 
 var smsFlows = {
   standard: {
-    START: 'DelivrGH NEW ORDER #DLV-00050: Pickup: Accra Central Post Office. Drop: East Legon Total. GHS 24.00. Cash on delivery. Reply YES to accept or NO to decline. Expires 60 sec.',
-    YES:    'DelivrGH: ✅ Order DLV-00050 ACCEPTED. Head to Accra Central PO. Customer: Ama (+233 24 567 8901). GHS 24.00 cash on delivery. Text PICKUP when you have the package.',
-    NO:     'DelivrGH: Order DLV-00050 declined. Next available order will be sent shortly.',
-    PICKUP: 'DelivrGH: ✅ Pickup confirmed — DLV-00050. Navigate to East Legon Total. Collect GHS 24.00 cash at delivery. Text DONE when delivered.',
-    DONE:   'DelivrGH: ✅ Delivery complete! Cash receipt confirmed. Great job, Kofi! 🎉 Balance unchanged (cash order).',
-    STATUS: 'DelivrGH STATUS: DLV-00050 · Pickup: Accra Central PO · Drop: East Legon Total · GHS 24.00 Cash · Accepted. Text PICKUP when collected.',
-    PAID:   'DelivrGH: PAID command is for mobile money orders only. This is a cash order (GHS 24.00).',
-    HELP:   'DelivrGH COMMANDS: YES=accept | NO=decline | PICKUP=collected | DONE=delivered | PAID=momo confirmed | STATUS=details | HELP TW=Twi | HELP GA=Ga',
-    'HELP TW': 'DelivrGH (Twi): YES=gye order | NO=gyae | PICKUP=me de pakiti | DONE=me de kɔ | PAID=sika kɔe | STATUS=nsɛm | Wo ne Delivr GH!',
-    'HELP GA': 'DelivrGH (Ga): YES=tɛ order | NO=ŋmɛ | PICKUP=mi sɛ pakiti | DONE=mi dzɔ | PAID=sika gbɛ | STATUS=info | Afi Delivr GH!'
+    START: 'Russhit NEW ORDER #DLV-00050: Pickup: Accra Central Post Office. Drop: East Legon Total. GHS 24.00. Cash on delivery. Reply YES to accept or NO to decline. Expires 60 sec.',
+    YES:    'Russhit: ✅ Order DLV-00050 ACCEPTED. Head to Accra Central PO. Customer: Ama (+233 24 567 8901). GHS 24.00 cash on delivery. Text PICKUP when you have the package.',
+    NO:     'Russhit: Order DLV-00050 declined. Next available order will be sent shortly.',
+    PICKUP: 'Russhit: ✅ Pickup confirmed — DLV-00050. Navigate to East Legon Total. Collect GHS 24.00 cash at delivery. Text DONE when delivered.',
+    DONE:   'Russhit: ✅ Delivery complete! Cash receipt confirmed. Great job, Kofi! 🎉 Balance unchanged (cash order).',
+    STATUS: 'Russhit STATUS: DLV-00050 · Pickup: Accra Central PO · Drop: East Legon Total · GHS 24.00 Cash · Accepted. Text PICKUP when collected.',
+    PAID:   'Russhit: PAID command is for mobile money orders only. This is a cash order (GHS 24.00).',
+    HELP:   'Russhit COMMANDS: YES=accept | NO=decline | PICKUP=collected | DONE=delivered | PAID=momo confirmed | STATUS=details | HELP TW=Twi | HELP GA=Ga',
+    'HELP TW': 'Russhit (Twi): YES=gye order | NO=gyae | PICKUP=me de pakiti | DONE=me de kɔ | PAID=sika kɔe | STATUS=nsɛm | Wo ne Russhit!',
+    'HELP GA': 'Russhit (Ga): YES=tɛ order | NO=ŋmɛ | PICKUP=mi sɛ pakiti | DONE=mi dzɔ | PAID=sika gbɛ | STATUS=info | Afi Russhit!'
   },
   momo: {
-    START: 'DelivrGH NEW ORDER #DLV-00051: Pickup: Osu Oxford St. Drop: East Legon Shell. GHS 38.00. ⚠️ Mobile Money payment required (above GHS 25 limit). Reply YES to accept or NO to decline.',
-    YES:   'DelivrGH: ✅ Order DLV-00051 ACCEPTED. Head to Osu Oxford St. Customer: Kofi (+233 20 123 4567). ⚠️ DO NOT collect cash — customer will pay via MoMo. Await payment confirmation before pickup. Text PICKUP once notified.',
-    NO:    'DelivrGH: Order DLV-00051 declined. Next available order will be sent shortly.',
-    PICKUP:'DelivrGH: ✅ Pickup confirmed — DLV-00051. Navigate to East Legon Shell. Text DONE when delivered. GHS 38.00 will be credited to your wallet.',
-    DONE:  'DelivrGH: ✅ Delivery complete! GHS 38.00 credited to your wallet. New balance: GHS 346.50. Great job, Kofi! 🎉',
-    STATUS:'DelivrGH STATUS: DLV-00051 · Pickup: Osu Oxford St · Drop: East Legon Shell · GHS 38.00 MoMo · Awaiting payment confirmation.',
-    PAID:  'DelivrGH: ✅ MoMo payment of GHS 38.00 verified for DLV-00051. Funds secured. You may now proceed to pickup. Text PICKUP when package is collected.',
-    HELP:  'DelivrGH COMMANDS: YES=accept | NO=decline | PICKUP=collected | DONE=delivered | PAID=momo confirmed | STATUS=details | HELP TW=Twi | HELP GA=Ga',
-    'HELP TW': 'DelivrGH (Twi): YES=gye order | NO=gyae | PICKUP=me de pakiti | DONE=me de kɔ | PAID=sika kɔe | STATUS=nsɛm | Wo ne Delivr GH!',
-    'HELP GA': 'DelivrGH (Ga): YES=tɛ order | NO=ŋmɛ | PICKUP=mi sɛ pakiti | DONE=mi dzɔ | PAID=sika gbɛ | STATUS=info | Afi Delivr GH!'
+    START: 'Russhit NEW ORDER #DLV-00051: Pickup: Osu Oxford St. Drop: East Legon Shell. GHS 38.00. ⚠️ Mobile Money payment required (above GHS 25 limit). Reply YES to accept or NO to decline.',
+    YES:   'Russhit: ✅ Order DLV-00051 ACCEPTED. Head to Osu Oxford St. Customer: Kofi (+233 20 123 4567). ⚠️ DO NOT collect cash — customer will pay via MoMo. Await payment confirmation before pickup. Text PICKUP once notified.',
+    NO:    'Russhit: Order DLV-00051 declined. Next available order will be sent shortly.',
+    PICKUP:'Russhit: ✅ Pickup confirmed — DLV-00051. Navigate to East Legon Shell. Text DONE when delivered. GHS 38.00 will be credited to your wallet.',
+    DONE:  'Russhit: ✅ Delivery complete! GHS 38.00 credited to your wallet. New balance: GHS 346.50. Great job, Kofi! 🎉',
+    STATUS:'Russhit STATUS: DLV-00051 · Pickup: Osu Oxford St · Drop: East Legon Shell · GHS 38.00 MoMo · Awaiting payment confirmation.',
+    PAID:  'Russhit: ✅ MoMo payment of GHS 38.00 verified for DLV-00051. Funds secured. You may now proceed to pickup. Text PICKUP when package is collected.',
+    HELP:  'Russhit COMMANDS: YES=accept | NO=decline | PICKUP=collected | DONE=delivered | PAID=momo confirmed | STATUS=details | HELP TW=Twi | HELP GA=Ga',
+    'HELP TW': 'Russhit (Twi): YES=gye order | NO=gyae | PICKUP=me de pakiti | DONE=me de kɔ | PAID=sika kɔe | STATUS=nsɛm | Wo ne Russhit!',
+    'HELP GA': 'Russhit (Ga): YES=tɛ order | NO=ŋmɛ | PICKUP=mi sɛ pakiti | DONE=mi dzɔ | PAID=sika gbɛ | STATUS=info | Afi Russhit!'
   }
 };
 // Active flow defaults to standard
@@ -1351,7 +1372,7 @@ function loadScenario(type) {
     // For momo scenario, also add the customer-side payment request after a short delay
     if(type === 'momo') {
       setTimeout(function() {
-        addSMSBubble('in', 'DelivrGH (to customer Kofi): Your delivery DLV-00051 is GHS 38.00. Send MoMo to: 0300000001 (Delivr GH). Reference: DLV00051. Then text PAID DLV00051 to confirm. Your driver is waiting.');
+        addSMSBubble('in', 'Russhit (to customer Kofi): Your delivery DLV-00051 is GHS 38.00. Send MoMo to: 0300000001 (Russhit). Reference: DLV00051. Then text PAID DLV00051 to confirm. Your driver is waiting.');
       }, 1500);
     }
   }
@@ -1393,11 +1414,11 @@ function sendSMS() {
       // After PAID in momo scenario, simulate system verification delay
       if(key === 'PAID' && smsScenario === 'momo') {
         setTimeout(function() {
-          addSMSBubble('in', 'DelivrGH SYSTEM: Payment of GHS 38.00 verified via Paystack ✅. Booking DLV-00051 is now active. Safe delivery, Kofi!');
+          addSMSBubble('in', 'Russhit SYSTEM: Payment of GHS 38.00 verified via Paystack ✅. Booking DLV-00051 is now active. Safe delivery, Kofi!');
         }, 1800);
       }
     } else {
-      addSMSBubble('in', 'DelivrGH: Unknown command "'+val+'". Text HELP for a list of valid commands.');
+      addSMSBubble('in', 'Russhit: Unknown command "'+val+'". Text HELP for a list of valid commands.');
     }
   }, 800);
 }
@@ -1420,7 +1441,7 @@ screens['ussd-demo'] = function() {
 };
 
 function ussdMain() {
-  return 'DelivrGH Driver Menu\n\n1. View pending orders\n2. Accept current order\n3. Mark as picked up\n4. Mark as delivered\n5. Check earnings\n6. Go offline\n\n0. Exit';
+  return 'Russhit Driver Menu\n\n1. View pending orders\n2. Accept current order\n3. Mark as picked up\n4. Mark as delivered\n5. Check earnings\n6. Go offline\n\n0. Exit';
 }
 var ussdState = 'main';
 function submitUSSD() {
@@ -1690,6 +1711,341 @@ function triggerNotif(title, body) {
     }, 400);
   }, 4000);
 }
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// MERCHANT SCREENS — Russhit B2B Portal
+// ═══════════════════════════════════════════════════════════════════════
+
+// ── MERCHANT HOME ────────────────────────────────────────────────────────
+screens['merchant-home'] = function() {
+  return '<div class="fade-in">' +
+  '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">' +
+    mkStat('Deliveries today','28','up','+6 vs yesterday','ti-package') +
+    mkStat('Active now','2','brand','● Live tracking','ti-loader') +
+    mkStat('Spend today','GHS 812','green','GHS 0 platform fee','ti-currency') +
+    mkStat('On-time rate','96%','up','+2% this week','ti-chart-bar') +
+  '</div>' +
+  '<div class="grid2">' +
+    '<div class="card">' +
+      '<div class="card-header"><span class="card-title">Quick book</span><span class="badge brand">Merchant</span></div>' +
+      '<div class="card-body">' +
+        '<div style="background:var(--brand-light);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;font-size:13px;border:1px solid rgba(27,67,50,0.15)">' +
+          '<i class="ti ti-brand-whatsapp" style="color:#25D366;font-size:16px"></i> ' +
+          '<strong style="color:var(--brand)">WhatsApp booking:</strong> <span style="color:var(--gray600)">Send <code style="background:rgba(0,0,0,0.06);padding:1px 6px;border-radius:3px">SEND [customer name] [phone] [address] [description]</code> to book a delivery without opening the app.</span>' +
+        '</div>' +
+        '<div class="form-group"><label class="form-label">Customer phone</label><input class="form-input" placeholder="+233 24 ..."></div>' +
+        '<div class="form-group"><label class="form-label">Delivery address</label><input class="form-input" placeholder="East Legon, Accra"></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+          '<div class="form-group"><label class="form-label">Package</label><input class="form-input" placeholder="Medicines, small box"></div>' +
+          '<div class="form-group"><label class="form-label">Vehicle</label><select class="form-input form-select"><option>Motorbike</option><option>Car</option><option>Van</option></select></div>' +
+        '</div>' +
+        '<button class="btn btn-primary btn-full" onclick="nav(\'book\')"><i class="ti ti-package"></i> Book delivery — est. GHS 18.00</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-header"><span class="card-title">Recent deliveries</span><button class="btn btn-secondary btn-sm" onclick="nav(\'merchant-deliveries\')">See all</button></div>' +
+      bRow('DLV-00892','Osu → East Legon','GHS 28.50','Today 2:14pm','en_route') +
+      bRow('DLV-00891','Osu → Airport Res.','GHS 22.00','Today 11:30am','delivered') +
+      bRow('DLV-00890','Osu → Madina','GHS 35.00','Today 9:15am','delivered') +
+      bRow('DLV-00889','Osu → Tema','GHS 48.00','Yesterday','delivered') +
+    '</div>' +
+  '</div></div>';
+};
+
+function mkStat(label,val,type,sub,icon){
+  var cs={up:'var(--green)',down:'var(--red)',brand:'var(--brand)',green:'var(--green)'}[type]||'var(--gray500)';
+  return '<div class="card"><div class="card-body">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
+      '<div style="font-size:12px;color:var(--gray500);font-weight:600">'+label+'</div>' +
+      '<div style="width:30px;height:30px;background:var(--brand-light);border-radius:8px;display:flex;align-items:center;justify-content:center">' +
+        '<i class="ti '+icon+'" style="font-size:14px;color:var(--brand)"></i></div>' +
+    '</div>' +
+    '<div style="font-size:28px;font-weight:800;color:var(--gray800);margin-bottom:4px">'+val+'</div>' +
+    '<div style="font-size:12px;font-weight:500;color:'+cs+'">'+sub+'</div>' +
+  '</div></div>';
+}
+function bRow(ref,route,fare,date,status){
+  var chips={en_route:'<span class="chip brand" style="font-size:10px">● En route</span>',delivered:'<span class="chip green" style="font-size:10px">Delivered</span>',assigned:'<span class="chip amber" style="font-size:10px">Assigned</span>'};
+  return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--gray100);cursor:pointer" onclick="nav(\'track\')">' +
+    '<div><div style="font-size:13px;font-weight:600">'+route+'</div><div style="font-size:11px;color:var(--gray400)">'+ref+' · '+date+'</div></div>' +
+    '<div style="text-align:right"><div style="font-size:13px;font-weight:700">'+fare+'</div>'+(chips[status]||'')+'</div>' +
+  '</div>';
+}
+
+// ── WHATSAPP ONBOARDING & BOOKING ─────────────────────────────────────────
+screens['wa-booking'] = function() {
+  return '<div class="fade-in"><div class="grid2">' +
+    '<div class="card">' +
+      '<div class="card-header">' +
+        '<div><div class="card-title"><i class="ti ti-brand-whatsapp" style="color:#25D366;margin-right:5px"></i>WhatsApp merchant flow</div>' +
+          '<div style="font-size:11.5px;color:var(--gray400);margin-top:2px">Russhit Business · +233 30 000 0001</div></div>' +
+        '<div style="display:flex;gap:6px">' +
+          '<button class="btn btn-secondary btn-sm" onclick="loadWA(\'onboard\')">Onboarding (new merchant)</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="loadWA(\'book\')">Booking flow</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="loadWA(\'status\')">Status &amp; tracking</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="background:#075E54;padding:8px 14px;font-size:11px;color:rgba(255,255,255,0.65);display:flex;align-items:center;gap:6px">' +
+        '<i class="ti ti-lock" style="font-size:12px"></i> End-to-end encrypted &nbsp;·&nbsp; Russhit Business Account' +
+      '</div>' +
+      '<div id="wa-thread" style="display:flex;flex-direction:column;gap:8px;padding:14px;min-height:280px;max-height:420px;overflow-y:auto;background:#E5DDD5"></div>' +
+      '<div style="padding:10px;background:#F0F0F0;display:flex;gap:8px;border-top:1px solid #ddd">' +
+        '<input class="form-input" id="wa-inp" placeholder="Type a message or try HELP, HISTORY, BALANCE…" style="border-radius:20px;font-size:12.5px;flex:1">' +
+        '<button class="btn btn-primary" style="border-radius:20px;padding:8px 14px" onclick="sendWAMsg()"><i class="ti ti-send"></i></button>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:12px">' +
+      '<div class="card"><div class="card-header"><span class="card-title">6-step onboarding conversation</span><span class="chip brand">No app needed</span></div><div class="card-body">' +
+        '<div style="font-size:12.5px;color:var(--gray500);margin-bottom:12px">New merchants onboard entirely within WhatsApp. Zero app downloads. Zero web forms.</div>' +
+        waStep(1,'Business name','System asks for business name to create account') +
+        waStep(2,'Business type','Restaurant / Pharmacy / Grocery / Social seller / Other') +
+        waStep(3,'Location area','Area in Accra for route matching and pickup defaults') +
+        waStep(4,'Contact number','Phone for customer notifications and account login') +
+        waStep(5,'Location pin','Merchant shares GPS pin \u2014 saved as default pickup address') +
+        waStep(6,'Account live','Confirmation sent. Merchant can send first SEND command immediately.') +
+      '</div></div>' +
+      '<div class="card"><div class="card-header"><span class="card-title">Command reference</span></div><div class="card-body">' +
+        waCmd('SEND [name] [phone] [address] [desc]','Book a delivery from your saved pickup address') +
+        waCmd('STATUS [ref]','Get live status and ETA') +
+        waCmd('TRACK [ref]','Shareable tracking link for your customer') +
+        waCmd('HISTORY','Your last 10 deliveries') +
+        waCmd('BALANCE','Russhit wallet balance') +
+        waCmd('TOPUP','Top up wallet via mobile money') +
+        waCmd('SETTINGS','Update business name, address or phone') +
+        waCmd('HELP','Full command list in English, Twi or Ga') +
+      '</div></div>' +
+    '</div>' +
+  '</div></div>';
+};
+
+function waStep(n,title,desc){
+  return '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">' +
+    '<div style="width:22px;height:22px;border-radius:50%;background:var(--brand-light);color:var(--brand);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">'+n+'</div>' +
+    '<div><div style="font-size:13px;font-weight:600">'+title+'</div><div style="font-size:12px;color:var(--gray500)">'+desc+'</div></div>' +
+  '</div>';
+}
+function waCmd(cmd,desc){
+  return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray100)">' +
+    '<code style="background:var(--brand-light);color:var(--brand);padding:2px 8px;border-radius:4px;font-size:11px;flex-shrink:0;white-space:nowrap">'+cmd+'</code>' +
+    '<span style="font-size:12px;color:var(--gray600)">'+desc+'</span>' +
+  '</div>';
+}
+
+var waScenarios = {
+  onboard: [
+    {s:'in', t:'👋 Welcome to Russhit!\n\nFast, fair deliveries for your business — starting in Accra.\n\nTo get started, what is your business name?'},
+    {s:'out', t:"Abena's Pharmacy"},
+    {s:'in', t:"Great! What type of business is Abena's Pharmacy?\n\nReply with the number:\n1 — Restaurant / Food\n2 — Pharmacy / Clinic\n3 — Grocery / Provisions\n4 — Laundry / Dry cleaning\n5 — Social media seller\n6 — Other business"},
+    {s:'out', t:'2'},
+    {s:'in', t:'Perfect! What area of Accra is your pharmacy in?\n\n(e.g. Osu, East Legon, Madina, Tema, Dansoman)'},
+    {s:'out', t:'Osu, near Oxford Street'},
+    {s:'in', t:'Got it. What WhatsApp number should we use to notify your customers about their deliveries?\n\n(Can be different from this number)'},
+    {s:'out', t:'+233 24 567 8901'},
+    {s:'in', t:'Almost done! 📍 Please share your pharmacy\'s location pin so we can save it as your default pickup address.\n\n(Tap the 📎 clip icon → Location)'},
+    {s:'out', t:'📍 Location shared: Osu Oxford Street'},
+    {s:'in', t:"✅ Abena's Pharmacy is now live on Russhit!\n\nTo book your first delivery, send:\n\nSEND [customer name] [phone] [address] [description]\n\nExample:\nSEND Kofi 0241234567 \"East Legon Total\" Medicines small box\n\nText HELP anytime for commands. 🚀"},
+  ],
+  book: [
+    {s:'out', t:'SEND Ama 0201234567 "Airport Residential" Prescription medicines fragile'},
+    {s:'in', t:'📦 Booking confirmed!\n\nRef: DLV-00893\nPickup: Osu Oxford St (your address)\nDrop: Airport Residential\nCustomer: Ama — 0201234567\nPackage: Prescription medicines (fragile ⚠️)\nVehicle: Motorbike 🏍️\nFare: GHS 22.00\n\nYour customer has been sent a tracking SMS.\nShare: russhit.app/t/QRS456'},
+    {s:'in', t:'✅ Driver found!\n\nKwame A. — GT-2345-21\n⭐ 4.9 rating · 312 trips\nETA to pickup: 6 minutes'},
+  ],
+  status: [
+    {s:'out', t:'STATUS DLV-00893'},
+    {s:'in', t:'📍 DLV-00893 STATUS\n\nRoute: Osu → Airport Residential\nDriver: Kwame A. — GT-2345-21 🏍️\nStatus: En route to delivery\nETA: ~9 minutes\n\nTracking: russhit.app/t/QRS456'},
+    {s:'out', t:'TRACK DLV-00893'},
+    {s:'in', t:'🔗 Share this tracking link with Ama:\n\nrusshit.app/t/QRS456\n\nNo app download needed — opens in any browser. Your pharmacy name appears on the tracking page.'},
+    {s:'out', t:'HISTORY'},
+    {s:'in', t:'📋 Last 5 deliveries:\n\n1. DLV-00893 — GHS 22.00 — En route ●\n2. DLV-00892 — GHS 28.50 — Delivered ✓\n3. DLV-00891 — GHS 35.00 — Delivered ✓\n4. DLV-00890 — GHS 22.00 — Delivered ✓\n5. DLV-00889 — GHS 48.00 — Delivered ✓'},
+  ]
+};
+
+var waCurrentScenario = 'onboard';
+function loadWA(scenario) {
+  waCurrentScenario = scenario;
+  var thread = document.getElementById('wa-thread');
+  if(!thread) return;
+  thread.innerHTML = '';
+  var msgs = waScenarios[scenario];
+  msgs.forEach(function(m, i) {
+    setTimeout(function() { addWABubble(m.s, m.t); }, i * 500);
+  });
+}
+function addWABubble(side, text) {
+  var thread = document.getElementById('wa-thread');
+  if(!thread) return;
+  var div = document.createElement('div');
+  div.style.cssText = 'max-width:82%;padding:8px 12px;border-radius:8px;font-size:12.5px;line-height:1.55;word-break:break-word;' +
+    (side==='in' ? 'background:#fff;color:#1f2937;align-self:flex-start;border-top-left-radius:0;border:1px solid #e5e7eb;' : 'background:#D9FDD3;color:#1f2937;align-self:flex-end;border-top-right-radius:0;');
+  div.style.alignSelf = side==='in' ? 'flex-start' : 'flex-end';
+  div.innerHTML = '<div>'+text.replace(/\n/g,'<br>')+'</div>' +
+    '<div style="font-size:10px;color:var(--gray400);margin-top:3px;text-align:right">'+(side==='in'?'Russhit':'You')+' · just now</div>';
+  thread.appendChild(div);
+  thread.scrollTop = thread.scrollHeight;
+}
+function sendWAMsg() {
+  var inp = document.getElementById('wa-inp');
+  if(!inp || !inp.value.trim()) return;
+  var val = inp.value.trim(); inp.value = '';
+  addWABubble('out', val);
+  var v = val.toUpperCase();
+  var auto = {
+    'HELP': 'Russhit commands:\n\nSEND — book a delivery\nSTATUS [ref] — check delivery\nTRACK [ref] — tracking link\nHISTORY — last 10 orders\nBALANCE — wallet balance\nTOPUP — add wallet credit\nSETTINGS — update profile\n\nReply HELP TW for Twi or HELP GA for Ga.',
+    'HELP TW': 'Russhit (Twi):\n\nSEND — book order\nSTATUS [ref] — hwɛ order\nTRACK [ref] — tracking link\nHISTORY — order list\nBALANCE — sika\n\nWo ne Russhit! 🚀',
+    'HELP GA': 'Russhit (Ga):\n\nSEND — book order\nSTATUS [ref] — lɛ akɛ\nTRACK [ref] — tracking\nHISTORY — order list\nBALANCE — sika\n\nAfi Russhit! 🚀',
+    'BALANCE': '💰 Russhit wallet: GHS 0.00\n\nYou are on the pay-per-delivery plan. Text TOPUP to add prepaid credit for faster bookings.',
+    'HISTORY': '📋 Last 5 deliveries:\n\n1. DLV-00892 — GHS 28.50 — Delivered ✓\n2. DLV-00891 — GHS 22.00 — Delivered ✓\n3. DLV-00890 — GHS 35.00 — Delivered ✓\n4. DLV-00889 — GHS 48.00 — Delivered ✓\n5. DLV-00888 — GHS 18.00 — Delivered ✓',
+    'TOPUP': '💳 To top up your Russhit wallet:\n\nSend MoMo to: 0300000001 (Russhit)\nThen reply: PAID [amount] e.g. PAID 50\n\nMinimum top-up: GHS 20',
+  };
+  setTimeout(function() {
+    var reply = auto[v];
+    if(!reply && v.startsWith('SEND ')) {
+      reply = '📦 Booking created!\n\nRef: DLV-00899\nPickup: Your saved address\nSearching for a rider...\n\nTracking: russhit.app/t/NEW999';
+      setTimeout(function(){ addWABubble('in', '✅ Kwame A. assigned — GT-2345-21 🏍️\nETA to pickup: 5 min'); }, 2200);
+    } else if(!reply && v.startsWith('STATUS ')) {
+      reply = '📍 En route to delivery. ETA 8 min.\n\nTracking: russhit.app/t/XYZ123';
+    } else if(!reply && v.startsWith('TRACK ')) {
+      reply = '🔗 russhit.app/t/XYZ123\n\nShare with your customer — no app needed.';
+    } else if(!reply) {
+      reply = "I didn't understand that. Text HELP for a full list of commands.";
+    }
+    addWABubble('in', reply);
+  }, 800);
+}
+
+// ── MERCHANT DELIVERIES ───────────────────────────────────────────────────
+screens['merchant-deliveries'] = function() {
+  return '<div class="fade-in"><div class="card">' +
+    '<div class="card-header"><span class="card-title">All deliveries</span>' +
+      '<div style="display:flex;gap:8px">' +
+        '<select class="form-input form-select" style="width:auto;padding:6px 22px 6px 10px;font-size:12px"><option>All</option><option>Live</option><option>Delivered</option><option>Cancelled</option></select>' +
+        '<button class="btn btn-secondary btn-sm"><i class="ti ti-upload"></i> Bulk CSV</button>' +
+        '<button class="btn btn-secondary btn-sm"><i class="ti ti-download"></i> Export</button>' +
+      '</div>' +
+    '</div>' +
+    '<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Ref</th><th>Route</th><th>Customer</th><th>Driver</th><th>Fare</th><th>Source</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>' +
+      mRow('DLV-00892','Osu → East Legon','Ama K.','Kwame A.','GHS 28.50','whatsapp','en_route','Today 2:14pm') +
+      mRow('DLV-00891','Osu → Airport Res.','Kofi B.','Yaa M.','GHS 22.00','app','delivered','Today 11:30am') +
+      mRow('DLV-00890','Osu → Madina','Adjoa M.','Kojo O.','GHS 35.00','api','delivered','Today 9:15am') +
+      mRow('DLV-00889','Osu → Tema','Samuel O.','Esi D.','GHS 48.00','whatsapp','delivered','Yesterday') +
+    '</tbody></table></div></div></div>';
+};
+function mRow(ref,route,cust,drv,fare,source,status,date){
+  var sc={en_route:'blue',delivered:'green',cancelled:'red'}[status]||'gray';
+  var st={en_route:'En route',delivered:'Delivered',cancelled:'Cancelled'}[status]||status;
+  var src={whatsapp:'<span class="chip green" style="font-size:10px"><i class="ti ti-brand-whatsapp"></i> WhatsApp</span>',app:'<span class="chip brand" style="font-size:10px">App</span>',api:'<span class="chip amber" style="font-size:10px">API</span>'}[source]||source;
+  return '<tr><td style="font-weight:600;color:var(--brand)">'+ref+'</td><td>'+route+'</td><td>'+cust+'</td><td>'+drv+'</td>' +
+    '<td style="font-weight:700">'+fare+'</td><td>'+src+'</td>' +
+    '<td><span class="chip '+sc+'">'+st+'</span></td>' +
+    '<td style="font-size:11px;color:var(--gray400)">'+date+'</td>' +
+    '<td><button class="btn btn-secondary btn-sm" onclick="nav(\'track\')"><i class="ti ti-eye"></i></button></td></tr>';
+}
+
+// ── MERCHANT ANALYTICS ────────────────────────────────────────────────────
+screens['merchant-analytics'] = function() {
+  return '<div class="fade-in">' +
+  '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">' +
+    mkStat('Deliveries this month','148','up','+24 vs last month','ti-truck') +
+    mkStat('Total spend','GHS 4,320','green','GHS 0 platform fees','ti-currency') +
+    mkStat('Avg delivery time','19 min','up','\u22122 min improved','ti-clock') +
+    mkStat('On-time rate','94%','up','+2% this month','ti-chart-bar') +
+  '</div>' +
+  '<div class="grid2">' +
+    '<div class="card"><div class="card-header"><span class="card-title">Daily deliveries — this month</span></div><div class="card-body">' +
+      miniBar([3,5,4,6,8,7,9,5,7,8,10,9,8,11,7,8,12,10,9,8,11,7,8,6,9,8,10,7,8,6]) +
+    '</div></div>' +
+    '<div class="card"><div class="card-header"><span class="card-title">Booking channels</span></div><div class="card-body">' +
+      hBar('WhatsApp bookings','72 orders (49%)','var(--green)',72) +
+      hBar('App bookings','44 orders (30%)','var(--brand)',44) +
+      hBar('API bookings','32 orders (21%)','var(--amber)',32) +
+    '</div></div>' +
+  '</div></div>';
+};
+function miniBar(vals){
+  var max=Math.max.apply(null,vals);
+  return '<div style="display:flex;align-items:flex-end;gap:2px;height:60px">' +
+    vals.map(function(v){ return '<div style="flex:1;height:'+(v/max*100).toFixed(0)+'%;background:var(--brand);border-radius:2px 2px 0 0;opacity:0.7"></div>'; }).join('') +
+  '</div><div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--gray400)">Dec 1</span><span style="font-size:10px;color:var(--gray400)">Dec 30</span></div>';
+}
+function hBar(label,value,color,pct){
+  return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+label+'</span><span style="font-weight:600">'+value+'</span></div>' +
+    '<div style="height:6px;background:var(--gray100);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px"></div></div></div>';
+}
+
+// ── MERCHANT API ──────────────────────────────────────────────────────────
+screens['merchant-api'] = function() {
+  return '<div class="fade-in" style="max-width:680px">' +
+  '<div class="card" style="margin-bottom:14px"><div class="card-header"><span class="card-title">API access & integrations</span><span class="chip brand">Business plan</span></div><div class="card-body">' +
+    '<div class="form-group"><label class="form-label">Your API key</label>' +
+      '<div style="display:flex;gap:7px">' +
+        '<input class="form-input" value="rsh_live_a8f2c9d4e7b138fc..." readonly style="font-family:monospace;font-size:13px;color:var(--brand)">' +
+        '<button class="btn btn-secondary btn-sm" onclick="showToast(\'API key copied\',\'success\')"><i class="ti ti-copy"></i> Copy</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="showToast(\'API key rotated — shown once only\',\'warning\')"><i class="ti ti-refresh"></i> Rotate</button>' +
+      '</div>' +
+      '<div style="font-size:11.5px;color:var(--gray400);margin-top:5px">Never expose this key in client-side code. Treat it like a password.</div>' +
+    '</div>' +
+    '<div class="form-group"><label class="form-label">Webhook URL for delivery events</label>' +
+      '<div style="display:flex;gap:7px">' +
+        '<input class="form-input" value="https://yourstore.com/hooks/russhit" placeholder="https://...">' +
+        '<button class="btn btn-primary btn-sm" onclick="showToast(\'Webhook URL saved\',\'success\')"><i class="ti ti-check"></i> Save</button>' +
+      '</div>' +
+      '<div style="font-size:11.5px;color:var(--gray400);margin-top:5px">Russhit sends signed POST requests on each status change.</div>' +
+    '</div>' +
+  '</div></div>' +
+  '<div class="card" style="margin-bottom:14px"><div class="card-header"><span class="card-title">Integration options</span></div><div class="card-body">' +
+    integRow('ti-brand-whatsapp','WhatsApp Business','Book deliveries by texting SEND from any WhatsApp number — no API key, no setup.','Active','green') +
+    integRow('ti-shopping-cart','Shopify App','Install from Shopify App Store. Russhit appears as a shipping option at checkout.','Available','brand') +
+    integRow('ti-brand-wordpress','WooCommerce Plugin','Install the plugin, enter your API key. Orders trigger bookings automatically.','Available','brand') +
+    integRow('ti-table','Google Sheets Add-on','Bulk-create bookings from a spreadsheet. Upload CSV of orders each morning.','Coming soon','amber') +
+    integRow('ti-code','REST API','Full programmatic access with API key authentication and webhook callbacks.','Active','green') +
+  '</div></div>' +
+  '<div class="card"><div class="card-header"><span class="card-title">API example — create a booking</span></div><div class="card-body">' +
+    '<div style="background:#1E293B;border-radius:var(--radius-sm);padding:14px;font-family:monospace;font-size:12px;color:#A5F3FC;line-height:1.7;overflow-x:auto">' +
+      'POST https://api.russhit.com/api/v1/bookings<br>' +
+      'Authorization: Bearer rsh_live_a8f2c9d4...<br><br>' +
+      '{<br>' +
+      '&nbsp;&nbsp;"pickup_lat": 5.5558, "pickup_lng": -0.1903,<br>' +
+      '&nbsp;&nbsp;"stops": [{"address":"East Legon","lat":5.6037,"lng":-0.1522}],<br>' +
+      '&nbsp;&nbsp;"vehicle_type": "motorbike",<br>' +
+      '&nbsp;&nbsp;"package_desc": "Prescription medicines",<br>' +
+      '&nbsp;&nbsp;"payment_method": "mobile_money"<br>' +
+      '}' +
+    '</div>' +
+  '</div></div></div>';
+};
+function integRow(icon,name,desc,status,sc){
+  return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--gray100)">' +
+    '<div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--brand-light);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+      '<i class="ti '+icon+'" style="font-size:16px;color:var(--brand)"></i></div>' +
+    '<div style="flex:1"><div style="font-size:13px;font-weight:700">'+name+'</div><div style="font-size:12px;color:var(--gray500)">'+desc+'</div></div>' +
+    '<span class="chip '+sc+'">'+status+'</span>' +
+  '</div>';
+}
+
+// ── MERCHANT PROFILE ──────────────────────────────────────────────────────
+screens['merchant-profile'] = function() {
+  return '<div class="fade-in" style="max-width:500px">' +
+  '<div class="card"><div class="card-body" style="text-align:center;padding:24px">' +
+    '<div style="width:64px;height:64px;border-radius:50%;background:var(--brand-light);color:var(--brand);font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 10px">AP</div>' +
+    '<div style="font-size:17px;font-weight:800">Abena\'s Pharmacy</div>' +
+    '<div style="font-size:12.5px;color:var(--gray400);margin-top:3px">+233 24 567 8901 · Osu, Accra</div>' +
+    '<div style="display:flex;justify-content:center;gap:8px;margin-top:10px">' +
+      '<span class="chip green">Active</span><span class="chip brand">WhatsApp enabled</span><span class="chip blue">Merchant</span>' +
+    '</div>' +
+  '</div>' +
+  '<div style="padding:0 20px 20px;display:grid;gap:12px">' +
+    '<div class="form-group"><label class="form-label">Business name</label><input class="form-input" value="Abena\'s Pharmacy"></div>' +
+    '<div class="form-group"><label class="form-label">Business type</label><select class="form-input form-select"><option>Pharmacy</option><option>Restaurant</option><option>Grocery</option><option>Laundry</option><option>Social media seller</option><option>Other</option></select></div>' +
+    '<div class="form-group"><label class="form-label">Default pickup address</label><input class="form-input" value="Osu Oxford Street, Accra"></div>' +
+    '<div class="form-group"><label class="form-label">WhatsApp number (for booking notifications)</label><input class="form-input" value="+233 24 567 8901"></div>' +
+    '<div class="form-group"><label class="form-label">Language preference</label><select class="form-input form-select"><option>English</option><option>Twi (Akan)</option><option>Ga</option></select></div>' +
+    '<button class="btn btn-primary btn-full" onclick="showToast(\'Profile updated successfully\',\'success\')"><i class="ti ti-check"></i> Save changes</button>' +
+  '</div></div></div>';
+};
+
+// Auto-load WA onboarding when screen appears
+var _origNav = typeof nav === 'function' ? nav : function(){};
 
 // INIT ──────────────────────────────────────────────────────────────────
 window.addEventListener('load', function() {
